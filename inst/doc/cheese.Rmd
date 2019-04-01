@@ -1,0 +1,377 @@
+---
+title: "Tutorial on cheese"
+author: Alex Zajichek
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: 
+    rmarkdown::html_vignette
+vignette: >
+    %\VignetteIndexEntry{Tutorial on cheese}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
+---
+
+#Introduction
+The data used in the following examples comes from the heart disease dataset found at the [UCI Machine Learning Repository](http://archive.ics.uci.edu/ml/datasets/Heart+Disease).
+
+```{r}
+#Load packages
+require(tidyverse); require(cheese)
+
+#Look at the top ten rows
+heart_disease
+
+```
+
+#Creating a univariate table
+The function `univariate_table` allows flexible summarization and presentation of variables in a dataset. Arguments are available to customize the statistics that are computed, association metrics, stratification variables, variable labels, etc. The `format` argument allows the user to render any table in "html", "latex", "markdown", "pandoc", "none" (i.e. return a `data.frame`). The following examples are rendered in "html" (default):
+
+##Default
+By default, the median (iqr), count (%), and the number of distinct values are displayed for numeric, categorical, and 'other' data types, 
+```{r}
+#Default table
+heart_disease %>%
+    univariate_table
+```
+
+##Stratification variables
+Any number of stratification variables can be added to the table, either to the rows and/or columns with an intuitive `formula` interface, where the left-hand side are _row_ strata, and the right-hand side are _column_ strata.. The argument `add_n` can be set to `TRUE` if row and/or column strata are present, in which case the sample size of that strata will be displayed.
+
+```{r}
+#Single column strata
+heart_disease %>%
+    univariate_table(
+        strata = ~HeartDisease
+    )
+heart_disease %>%
+    univariate_table(
+        strata = ~HeartDisease,
+        add_n = TRUE
+    )
+
+#Multiple column strata
+heart_disease %>%
+    univariate_table(
+        strata = ~Sex + HeartDisease
+    )
+heart_disease %>%
+    univariate_table(
+        strata = ~Sex + HeartDisease,
+        add_n = TRUE,
+        strata_sep = "|"
+    )
+
+#Single row strata
+heart_disease %>%
+    univariate_table(
+        strata = Sex~1
+    )
+heart_disease %>%
+    univariate_table(
+        strata = Sex~1,
+        add_n = TRUE
+    )
+
+#Column and row strata
+heart_disease %>%
+    univariate_table(
+        strata = Sex~HeartDisease
+    )
+heart_disease %>%
+    univariate_table(
+        strata = Sex~HeartDisease,
+        add_n = TRUE
+    )
+
+```
+
+##Association statistics
+A typical practice is to add association metrics to a summary table, such as p-values, intended to evaluate the strength of relationship between a stratification column and the variables. The argument `associations` takes a `list` of functions, evaluates them for each variable/strata combination, and places the result in the table. Metrics are only computed if _column_ strata are present. If there are also row strata present, the metrics will be computed within each group.
+
+```{r}
+
+#Define functions to add to table
+pvalues <- 
+    function(
+        y, #Will be the strata variable
+        x #Each other variable
+    ) {
+        
+        #Different tests depending on type
+        if(is(x, "numeric")) {
+            wilcox.test(x~y)$p.value
+        } else {
+            fisher.test(table(x, y))$p.value
+        }
+        
+    }
+
+#Supply function to table
+heart_disease %>%
+    univariate_table(
+        strata = ~HeartDisease,
+        add_n = TRUE,
+        associations = pvalues
+    )
+
+#Make a named list to name the column
+metrics <- list(`P-value` = pvalues)
+heart_disease %>%
+    univariate_table(
+        strata = ~HeartDisease,
+        add_n = TRUE,
+        associations = metrics
+    )
+
+#Add additional function to list that computes the AIC of a logistic regression model
+metrics$AIC <- 
+    function(y, x) AIC(glm(factor(y)~x, family = "binomial"))
+heart_disease %>%
+    univariate_table(
+        strata = ~HeartDisease,
+        add_n = TRUE,
+        associations = metrics
+    )
+
+#Compute metrics across salary within sex
+heart_disease %>%
+    univariate_table(
+        strata = Sex~HeartDisease,
+        add_n = TRUE,
+        associations = metrics
+    )
+
+```
+
+##Custom string templates for summary statistics
+It may be of interest to present summary statistics other than the default, and in a different format. The `numeric_summary`, `categorical_summary`, and `other_summary` arguments take character vectors which allow any number of summaries to be added to the table in any format. Values are simply requested verbatim by name (i.e. "median (iqr) | mean (sd)" will provide a column in the table where the median, iqr, mean, and standard deviation are populatd with the result).
+
+```{r}
+
+#Add summary columns for numeric data
+heart_disease %>%
+    univariate_table(
+        numeric_summary = c(Median = "median", Mean = "mean")
+    )
+
+#Add a stratification variable
+heart_disease %>%
+    univariate_table(
+        numeric_summary = c(Median = "median", Mean = "mean"),
+        strata = ~HeartDisease
+    )
+
+```
+
+The following strings are available by default:
+
+*   Numeric types
+    *   "median"
+    *   "mean"
+    *   "min"
+    *   "max"
+    *   "iqr"
+    *   "sd"
+    
+*   Categorical types
+    *   "count"
+    *   "percent"
+
+*   All variables
+    *   "length"
+    *   "missing"
+    *   "available"
+    *   "unique"
+
+These can be placed in a string template in any format, and will be replaced with the actual value when the function is called.
+
+##Miscellaneous features
+Numerous other features are available to further customize the table:
+
+*   Provide clean labels to variable names and factor levels
+*   Enter custom summary statistics to compute on different types of data
+*   Choose which data types become evaluated with functions for numeric and categorical data
+*   Evaluate the string template as an `R` expression once populated with the result
+*   And more...
+
+See `?univariate_table` for details.
+
+#Core functions
+The functions used to implement different pieces of the specialized functions above were intentionally written to be generalizable and useful in other contexts.
+
+*   `divide`: Stratify a dataset into a list by 1 or more variables
+```{r}
+heart_disease %>%
+    divide(
+        by = "Sex"
+    )
+```
+
+*   `stratiply`: Apply a function to a data frame by one or more variables and easily gather results
+```{r}
+heart_disease %>%
+    stratiply(
+        strata = c("Sex", "HeartDisease"),
+        f = function(x) 
+            x %>% 
+            select_if(is.numeric) %>% 
+            map(mean, na.rm = TRUE),
+        bind = TRUE,
+        separate = TRUE
+    )   
+
+```
+
+*   `stretch`: Spread any number of values across the columns by any number of keys
+```{r}
+#Create a frame of summaries
+temp_summary <-
+    
+    heart_disease %>%
+    group_by(
+        Sex,
+        HeartDisease,
+        BloodSugar
+    ) %>%
+    summarise(
+        Mean = mean(Age, na.rm = TRUE),
+        SD = sd(Age, na.rm = TRUE),
+        Median = median(Age, na.rm = TRUE)
+    ) %>%
+    ungroup() 
+
+#Span summaries for each combination of Sex and BloodSugar
+temp_summary %>%
+    stretch(
+        keys = c("Sex", "BloodSugar"),
+        keep = "HeartDisease"
+    )
+
+#Clean HTML table with keys spanned over columns
+result <- 
+    temp_summary %>%
+    stretch(
+        keys = c("Sex", "BloodSugar"),
+        keep = "HeartDisease",
+        extract_keys_as_header = TRUE,
+        keep_keys_in_header = FALSE
+    )
+result$.result %>%
+    knitr::kable(format = "html") %>%
+    kableExtra::kable_styling() %>%
+    kableExtra::add_header_above(
+        kableExtra::auto_index(result$.header)
+    )
+    
+
+```
+
+*   `dish`: Evaluate a two-argument function on subsets of a data frame by evaluating each combination of columns or subsets
+```{r}
+heart_disease %>%
+    dish(
+        f =
+            function(y, x) {
+                mod <- lm(y ~ x)
+                tibble(
+                    Parameter = names(mod$coef),
+                    Estimate = mod$coef
+                )
+            },
+        left = c("Age", "BP"),
+        bind = TRUE
+    )
+
+```
+
+*   `absorb`: Fill the values from a key-value pair into a custom string template containing keys
+```{r}
+absorb(
+    key = c("mean", "sd", "var"),
+    value = c("10", "2", "4"),
+    text = 
+        c("MEAN: mean, SD: sd",
+          "VAR: var = sd^2",
+          MEAN = "mean"
+        )
+)
+
+```
+
+*   `typly`: Apply a function (or `list` of functions) to columns of a `data.frame` or elements of a `list` that conform to one or more types
+```{r}
+heart_disease %>%
+    
+    #Compute means and medians on numeric data
+    typly(
+        c("numeric", "logical"),
+        list(
+            mean = mean,
+            median = median
+        ),
+        keep = TRUE,
+        na.rm = TRUE
+    ) %>%
+    
+    #Compute table
+    typly(
+        "factor",
+        table,
+        keep = TRUE
+    )
+```
+
+*   `descriptives`: Gather descriptive statistics into a `data.frame`
+```{r}
+heart_disease %>%
+    descriptives(
+        f_numeric = 
+            list(
+                cv = function(x, na.rm) sd(x, na.rm = na.rm)/mean(x, na.rm = na.rm)
+            )
+    )
+```
+
+*   `univariate_associations`: Apply association functions to any number of "response" variables with any number of "predictors"
+```{r}
+#Make a list of functions
+f <-
+    list(
+        
+        #Compute a univariate p-value
+        `P-value` =
+            
+            function(x, y) {
+                
+                if(type_match(y, c("factor", "character"))) {
+                    
+                    p <- fisher.test(factor(x), factor(y), simulate.p.value = TRUE)$p.value
+                    
+                    
+                } else {
+                    
+                    p <- kruskal.test(y, factor(x))$p.value
+                    
+                }
+                if_else(
+                    p < 0.001, "<0.001", as.character(round(p, 2))
+                )
+            },
+        
+        #Compute difference in AIC model between null model and one predictor model
+        `AIC Difference` =
+            function(x, y) {
+                
+                glm(factor(x)~1, family = "binomial")$aic - 
+                glm(factor(x)~y, family = "binomial")$aic
+                
+            }
+    )
+
+#1) Apply functions to Sex/HeartDisease by all other variables
+heart_disease %>%
+    univariate_associations(
+        f = f,
+        responses = c("Sex", "HeartDisease")
+    )
+```
+

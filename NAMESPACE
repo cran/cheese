@@ -1,0 +1,18 @@
+importFrom("magrittr", "%>%")
+importFrom("rlang", ".data")
+importFrom("tibble", "tibble")
+importFrom("stats", "IQR", "median", "na.omit", "sd", "terms", "glm")
+
+export("%>%",
+       "divide",
+       "stratiply",
+       "stretch",
+       "dish",
+       "absorb",
+       "type_match",
+       "typly",
+       "descriptives",
+       "univariate_associations",
+       "univariate_table")
+
+
