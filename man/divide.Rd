@@ -41,14 +41,4 @@ heart_disease \%>\%
         by = starts_with("S")
     )
     
-#4) Negation
-heart_disease \%>\%
-    select(
-        Sex,
-        HeartDisease,
-        BloodSugar
-    ) \%>\%
-    divide(
-        by = -matches("^(S|H)")
-)
 }  

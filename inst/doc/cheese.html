@@ -214,10 +214,10 @@ require(tidyverse); require(cheese)
 <pre><code>## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──
 </code></pre>
 
-<pre><code>## ✔ ggplot2 3.1.0     ✔ purrr   0.2.5
-## ✔ tibble  1.4.2     ✔ dplyr   0.7.8
-## ✔ tidyr   0.8.2     ✔ stringr 1.3.1
-## ✔ readr   1.1.1     ✔ forcats 0.3.0
+<pre><code>## ✔ ggplot2 3.2.1     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
+## ✔ tidyr   0.8.3     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0
 </code></pre>
 
 <pre><code>## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
@@ -245,8 +245,8 @@ heart_disease
 ##  8    57 Fema… Asymptom…   120         354 FALSE            163
 ##  9    63 Male  Asymptom…   130         254 FALSE            147
 ## 10    53 Male  Asymptom…   140         203 TRUE             155
-## # ... with 293 more rows, and 2 more variables:
-## #   ExerciseInducedAngina &lt;fct&gt;, HeartDisease &lt;fct&gt;
+## # … with 293 more rows, and 2 more variables: ExerciseInducedAngina &lt;fct&gt;,
+## #   HeartDisease &lt;fct&gt;
 </code></pre>
 
 <p>#Creating a univariate table
@@ -774,6 +774,10 @@ heart_disease %&gt;%
     )
 </code></pre>
 
+<pre><code>## `mutate_if()` ignored the following grouping variables:
+## Column `.row_strata`
+</code></pre>
+
 <table class="table table-striped table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -925,6 +929,10 @@ heart_disease %&gt;%
     )
 </code></pre>
 
+<pre><code>## `mutate_if()` ignored the following grouping variables:
+## Column `.row_strata`
+</code></pre>
+
 <table class="table table-striped table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
@@ -1074,6 +1082,10 @@ heart_disease %&gt;%
     univariate_table(
         strata = Sex~HeartDisease
     )
+</code></pre>
+
+<pre><code>## `mutate_if()` ignored the following grouping variables:
+## Column `.row_strata`
 </code></pre>
 
 <table class="table table-striped table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -1228,6 +1240,10 @@ heart_disease %&gt;%
         strata = Sex~HeartDisease,
         add_n = TRUE
     )
+</code></pre>
+
+<pre><code>## `mutate_if()` ignored the following grouping variables:
+## Column `.row_strata`
 </code></pre>
 
 <table class="table table-striped table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -1762,6 +1778,10 @@ heart_disease %&gt;%
         add_n = TRUE,
         associations = metrics
     )
+</code></pre>
+
+<pre><code>## `mutate_if()` ignored the following grouping variables:
+## Column `.row_strata`
 </code></pre>
 
 <table class="table table-striped table-responsive" style="width: auto !important; margin-left: auto; margin-right: auto;">
@@ -2317,7 +2337,7 @@ The functions used to implement different pieces of the specialized functions ab
 ##  8    58 Non-angi…   120         340 FALSE            172 No              
 ##  9    66 Typical …   150         226 FALSE            114 No              
 ## 10    69 Typical …   140         239 FALSE            151 No              
-## # ... with 87 more rows, and 1 more variable: HeartDisease &lt;fct&gt;
+## # … with 87 more rows, and 1 more variable: HeartDisease &lt;fct&gt;
 ## 
 ## $Male
 ## # A tibble: 206 x 8
@@ -2333,7 +2353,7 @@ The functions used to implement different pieces of the specialized functions ab
 ##  8    57 Asymptom…   140         192 FALSE            148 No              
 ##  9    56 Non-angi…   130         256 TRUE             142 Yes             
 ## 10    44 Atypical…   120         263 FALSE            173 No              
-## # ... with 196 more rows, and 1 more variable: HeartDisease &lt;fct&gt;
+## # … with 196 more rows, and 1 more variable: HeartDisease &lt;fct&gt;
 </code></pre>
 
 <ul>
@@ -2394,7 +2414,7 @@ temp_summary %&gt;%
 ##   &lt;fct&gt;                   &lt;dbl&gt;           &lt;dbl&gt;            &lt;dbl&gt;
 ## 1 No                       54.0           10.4              53.5
 ## 2 Yes                      59.7            3.61             61  
-## # ... with 9 more variables: Mean_Male_FALSE &lt;dbl&gt;, SD_Male_FALSE &lt;dbl&gt;,
+## # … with 9 more variables: Mean_Male_FALSE &lt;dbl&gt;, SD_Male_FALSE &lt;dbl&gt;,
 ## #   Median_Male_FALSE &lt;dbl&gt;, Mean_Female_TRUE &lt;dbl&gt;, SD_Female_TRUE &lt;dbl&gt;,
 ## #   Median_Female_TRUE &lt;dbl&gt;, Mean_Male_TRUE &lt;dbl&gt;, SD_Male_TRUE &lt;dbl&gt;,
 ## #   Median_Male_TRUE &lt;dbl&gt;
@@ -2508,7 +2528,7 @@ result$.result %&gt;%
 ##  8 Age   Cholesterol x                   0.0365
 ##  9 Age   BloodSugar  (Intercept)        54.0   
 ## 10 Age   BloodSugar  xTRUE               3.01  
-## # ... with 22 more rows
+## # … with 22 more rows
 </code></pre>
 
 <ul>
@@ -2642,7 +2662,7 @@ result$.result %&gt;%
 ##  8 Age       sd          9.04 &lt;NA&gt;       &lt;NA&gt;       NA 9.04      
 ##  9 Age       min        29    &lt;NA&gt;       &lt;NA&gt;       NA 29        
 ## 10 Age       median     56    &lt;NA&gt;       &lt;NA&gt;       NA 56        
-## # ... with 92 more rows
+## # … with 92 more rows
 </code></pre>
 
 <ul>
