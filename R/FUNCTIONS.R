@@ -255,13 +255,10 @@ stretch <-
             #Remove header if requested
             if(!keep_keys_in_header) {
                 
-                .result <-
-                    results %>%
-                    dplyr::rename_at(
-                        dplyr::vars(
-                            -tidyselect::one_of(keep)
-                        ),
-                        stringr::str_remove,
+                .result <- results
+                names(.result)[which(names(.result) %in% keep)] <-
+                    names(.result)[which(names(.result) %in% keep)] %>%
+                    stringr::str_remove(
                         pattern = stringr::str_c("[", .sep, "].+")
                     )
                 

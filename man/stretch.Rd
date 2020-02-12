@@ -73,21 +73,5 @@ temp_summary \%>\%
         keep = "HeartDisease",
         send = c("Mean", "Median")
     )
-
-#4) Clean HTML table with keys spanned over columns
-result <- 
-    temp_summary \%>\%
-    stretch(
-        keys = c("Sex", "BloodSugar"),
-        keep = "HeartDisease",
-        extract_keys_as_header = TRUE,
-        keep_keys_in_header = FALSE
-    )
-result$.result \%>\%
-    knitr::kable(format = "html") \%>\%
-    kableExtra::kable_styling() \%>\%
-    kableExtra::add_header_above(
-        kableExtra::auto_index(result$.header)
-    )
     
 }
