@@ -5,14 +5,17 @@ importFrom("stats", "IQR", "median", "na.omit", "sd", "terms", "glm")
 
 export("%>%",
        "divide",
+       "depths_string",
+       "depths",
+       "fasten",
+       "muddle",
        "stratiply",
-       "stretch",
        "dish",
        "absorb",
-       "type_match",
+       "some_type",
        "typly",
+       "stretch",
+       "grable",
        "descriptives",
        "univariate_associations",
        "univariate_table")
-
-

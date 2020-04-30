@@ -1,0 +1,3422 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Custom string templates</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>Once a dataset is cleaned and ready for statistical analysis, the first step is typically to summarize it. The <code>univariate_table()</code> function makes it easy to create a custom descriptive analysis while consistently producing clean, presentation-ready output. It is built to integrate directly into your analysis work flow (e.g. R markdown) but can also be called from the console and be rendered in a number of formats.</p>
+
+<pre><code class="r">require(cheese)
+
+heart_disease %&gt;%
+  univariate_table()
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>By default, an HTML table is produced containing descriptive statistics for columns in the dataset. </p>
+
+<h1>Custom string templates</h1>
+
+<p>In the table above, the summary statistics are presented within the cells in a particular format for different types of data. You can use the <code>_summary</code> arguments to customize not only the appearance that the results are presented with, but the values that go into the results themselves.</p>
+
+<p>Suppose instead of the <code>&quot;median (q1, q3)&quot;</code> being displayed for numeric data, you want the <code>&quot;mean [sd] / median&quot;</code>, in that exact format:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    numeric_summary = 
+      c(
+        Summary = &quot;mean [sd] / median&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54.44 [9.04] / 56 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 131.69 [17.6] / 130 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 246.69 [51.78] / 241 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 149.61 [22.88] / 153 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>The name <code>Summary</code> was used to ensure that the result for the numeric data binded in the same column as the result for the other data types. If you chose to name it something else, you&#39;d get a new column with those summaries:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    numeric_summary = 
+      c(
+        NewSummary = &quot;mean [sd] / median&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> NewSummary </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54.44 [9.04] / 56 </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 131.69 [17.6] / 130 </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 246.69 [51.78] / 241 </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 149.61 [22.88] / 153 </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>You can add as many summary columns as you want separately for each type of data:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    numeric_summary = 
+      c(
+        `Numeric only` = &quot;mean [sd] / median&quot;,
+        Summary = &quot;median (q1, q3)&quot;
+      ),
+    categorical_summary = 
+      c(
+        Summary = &quot;count&quot;,
+        `Categorical only` = &quot;percent = 100 * proportion&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Numeric only </th>
+   <th style="text-align:left;"> Summary </th>
+   <th style="text-align:left;"> Categorical only </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54.44 [9.04] / 56 </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 97 </td>
+   <td style="text-align:left;"> 32.01 = 100 * 0.32 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 206 </td>
+   <td style="text-align:left;"> 67.99 = 100 * 0.68 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 23 </td>
+   <td style="text-align:left;"> 7.59 = 100 * 0.08 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 50 </td>
+   <td style="text-align:left;"> 16.5 = 100 * 0.17 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 86 </td>
+   <td style="text-align:left;"> 28.38 = 100 * 0.28 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 144 </td>
+   <td style="text-align:left;"> 47.52 = 100 * 0.48 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 131.69 [17.6] / 130 </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 246.69 [51.78] / 241 </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 149.61 [22.88] / 153 </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 204 </td>
+   <td style="text-align:left;"> 67.33 = 100 * 0.67 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 99 </td>
+   <td style="text-align:left;"> 32.67 = 100 * 0.33 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 164 </td>
+   <td style="text-align:left;"> 54.13 = 100 * 0.54 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 139 </td>
+   <td style="text-align:left;"> 45.87 = 100 * 0.46 </td>
+  </tr>
+</tbody>
+</table>
+
+<p>A more visually-appealing case for adding multiple summaries is probably when all the data is the same type:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    categorical_types = NULL, #Easily disable categorical data from being summarized
+    numeric_summary =
+      c(
+        `Median (Q1, Q3)` = &quot;median (q1, q3)&quot;,
+        `Min-Max` = &quot;min - max&quot;,
+        `Mean (SD)` = &quot;mean (sd)&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Median (Q1, Q3) </th>
+   <th style="text-align:left;"> Min-Max </th>
+   <th style="text-align:left;"> Mean (SD) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+   <td style="text-align:left;"> 29 - 77 </td>
+   <td style="text-align:left;"> 54.44 (9.04) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 94 - 200 </td>
+   <td style="text-align:left;"> 131.69 (17.6) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+   <td style="text-align:left;"> 126 - 564 </td>
+   <td style="text-align:left;"> 246.69 (51.78) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+   <td style="text-align:left;"> 71 - 202 </td>
+   <td style="text-align:left;"> 149.61 (22.88) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>Or when adding a summary that applies to all columns:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    all_summary = 
+      c(
+        `# obs. non-missing` = &quot;available of length&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+   <th style="text-align:left;"> # obs. non-missing </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> Sex </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="5"> ChestPain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BloodSugar </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> ExerciseInducedAngina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> HeartDisease </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 303 of 303 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+</tbody>
+</table>
+
+<p>These add an extra row for categorical variables. You may have also noticed that the <code>BloodSugar</code> column didn&#39;t show up in the table until the <code>all_summary</code> argument was used&ndash;this is because it is not classified as numeric or categorical data, and thus not evaluated by default. See the &ldquo;Backend functionality&rdquo; section to learn more.</p>
+
+<h1>Stratification variables</h1>
+
+<p>The <code>strata</code> argument takes a <code>formula()</code> that can be used to stratify the analysis by any number of variables. Columns on the left side will appear down the rows, and columns on the right side will spread across the columns. You can use <code>+</code> on either side to specify more than one column. Let&#39;s start by stratifying sex across the columns:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ Sex
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Female </th>
+   <th style="text-align:left;"> Male </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 57 (50, 63) </td>
+   <td style="text-align:left;"> 54.5 (47, 59.75) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (4.12%) </td>
+   <td style="text-align:left;"> 19 (9.22%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 18 (18.56%) </td>
+   <td style="text-align:left;"> 32 (15.53%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 35 (36.08%) </td>
+   <td style="text-align:left;"> 51 (24.76%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 40 (41.24%) </td>
+   <td style="text-align:left;"> 104 (50.49%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 132 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 254 (215, 302) </td>
+   <td style="text-align:left;"> 235 (208.75, 268.5) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 157 (142, 165) </td>
+   <td style="text-align:left;"> 150.5 (132, 167.5) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 75 (77.32%) </td>
+   <td style="text-align:left;"> 129 (62.62%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 22 (22.68%) </td>
+   <td style="text-align:left;"> 77 (37.38%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 72 (74.23%) </td>
+   <td style="text-align:left;"> 92 (44.66%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 25 (25.77%) </td>
+   <td style="text-align:left;"> 114 (55.34%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>You can do the same thing down the rows:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = Sex ~ 1
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Sex </th>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="12"> Female </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 57 (50, 63) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (4.12%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 18 (18.56%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 35 (36.08%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 40 (41.24%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 132 (120, 140) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 254 (215, 302) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 157 (142, 165) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 75 (77.32%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 22 (22.68%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 72 (74.23%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 25 (25.77%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="12"> Male </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54.5 (47, 59.75) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 19 (9.22%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 32 (15.53%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 51 (24.76%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 104 (50.49%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 235 (208.75, 268.5) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 150.5 (132, 167.5) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 129 (62.62%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 77 (37.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 92 (44.66%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 114 (55.34%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>Or even both:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = Sex ~ HeartDisease
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Sex </th>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Female </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Male </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>Now suppose you want both stratification variables across the columns:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ Sex + HeartDisease
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="border-bottom:hidden" colspan="2"></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Female</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Male</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>The levels will span the columns in a hierarchical fashion depending on their order in the formula:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ HeartDisease + Sex
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="border-bottom:hidden" colspan="2"></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">No</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Yes</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Female </th>
+   <th style="text-align:left;"> Male </th>
+   <th style="text-align:left;"> Female </th>
+   <th style="text-align:left;"> Male </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>Similarly, the rows also collapse hierarchically:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = HeartDisease + Sex ~ 1
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> HeartDisease </th>
+   <th style="text-align:left;"> Sex </th>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="20"> No </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Female </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Male </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="20"> Yes </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Female </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Male </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>You can use any of the functionality described in the previous section with stratification variables as well:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ Sex + HeartDisease,
+    numeric_summary = 
+      c(
+        `Mean (SD)` = &quot;mean (sd)&quot;
+      ),
+    categorical_summary = 
+      c(
+        `Count (%)` = &quot;count (percent%)&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="border-bottom:hidden" colspan="2"></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Female</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Male</div></th>
+</tr>
+<tr>
+<th style="border-bottom:hidden" colspan="2"></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">No</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Yes</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">No</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Yes</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Mean (SD) </th>
+   <th style="text-align:left;"> Count (%) </th>
+   <th style="text-align:left;"> Mean (SD) </th>
+   <th style="text-align:left;"> Count (%) </th>
+   <th style="text-align:left;"> Mean (SD) </th>
+   <th style="text-align:left;"> Count (%) </th>
+   <th style="text-align:left;"> Mean (SD) </th>
+   <th style="text-align:left;"> Count (%) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54.56 (10.27) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 59.08 (4.86) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 51.04 (8.62) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56.09 (8.39) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 128.74 (16.54) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 146.6 (21.12) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 129.65 (16.02) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 131.93 (17.22) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 256.75 (66.22) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 276.16 (59.88) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 231.6 (37.64) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 246.06 (45.44) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 154.03 (19.25) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 143.16 (20.18) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 161.78 (18.56) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 138.4 (23.08) </td>
+   <td style="text-align:left;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>The summary columns simply get added to the column-spanning hierarchy.</p>
+
+<h2>Adding sample size</h2>
+
+<p>The <code>add_n</code> argument will add the sample size to the label for the stratification group:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ Sex,
+    add_n = TRUE
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Female (N=97) </th>
+   <th style="text-align:left;"> Male (N=206) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 57 (50, 63) </td>
+   <td style="text-align:left;"> 54.5 (47, 59.75) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (4.12%) </td>
+   <td style="text-align:left;"> 19 (9.22%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 18 (18.56%) </td>
+   <td style="text-align:left;"> 32 (15.53%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 35 (36.08%) </td>
+   <td style="text-align:left;"> 51 (24.76%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 40 (41.24%) </td>
+   <td style="text-align:left;"> 104 (50.49%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 132 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 254 (215, 302) </td>
+   <td style="text-align:left;"> 235 (208.75, 268.5) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 157 (142, 165) </td>
+   <td style="text-align:left;"> 150.5 (132, 167.5) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 75 (77.32%) </td>
+   <td style="text-align:left;"> 129 (62.62%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 22 (22.68%) </td>
+   <td style="text-align:left;"> 77 (37.38%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 72 (74.23%) </td>
+   <td style="text-align:left;"> 92 (44.66%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 25 (25.77%) </td>
+   <td style="text-align:left;"> 114 (55.34%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>When multiple stratification variables are added on one side of the formula, the sample size will show up on the lowest level of the hierarchy, excluding summary columns:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ Sex + HeartDisease,
+    add_n = TRUE
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="border-bottom:hidden" colspan="2"></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Female</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Male</div></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No (N=72) </th>
+   <th style="text-align:left;"> Yes (N=25) </th>
+   <th style="text-align:left;"> No (N=92) </th>
+   <th style="text-align:left;"> Yes (N=114) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>A limitation is that when sample size is added in the presence of row and column strata, it is displayed for the marginal groups only:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = Sex ~ HeartDisease,
+    add_n = TRUE
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Sex </th>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No (N=164) </th>
+   <th style="text-align:left;"> Yes (N=139) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Female (N=97) </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="10"> Male (N=206) </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+  </tr>
+</tbody>
+</table>
+
+<h2>Association metrics</h2>
+
+<p>Often when a descriptive analysis is stratified by one or more variables, it is also of interest to add statistics that compare each variable across the groups. The <code>associations</code> argument allows you to add a list containing an unlimited number of functions that can produce a scalar value to be placed in the table. First, let&#39;s define a function:</p>
+
+<pre><code class="r">#Function for a p-value
+pval &lt;-
+  function(y, x) {
+
+    #For categorical data use Fisher&#39;s Exact test
+    if(some_type(x, &quot;factor&quot;)) {
+
+      p &lt;- fisher.test(factor(y), factor(x), simulate.p.value = TRUE)$p.value
+
+    #Otherwise use Kruskall-Wallis
+    } else {
+
+      p &lt;- kruskal.test(x, factor(y))$p.value
+
+    }
+
+    ifelse(p &lt; 0.001, &quot;&lt;0.001&quot;, as.character(round(p, 2)))
+
+  }
+</code></pre>
+
+<p>The stratification variable will be placed in the <em>second</em> argument of the function(s) provided. Now you can add it to the function call:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ HeartDisease,
+    associations = list(`P-value` = pval)
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+   <th style="text-align:left;"> P-value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 52 (44.75, 59) </td>
+   <td style="text-align:left;"> 58 (52, 62) </td>
+   <td style="text-align:left;"> 0.12 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> Sex </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 72 (43.9%) </td>
+   <td style="text-align:left;"> 25 (17.99%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 92 (56.1%) </td>
+   <td style="text-align:left;"> 114 (82.01%) </td>
+   
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="5"> ChestPain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 16 (9.76%) </td>
+   <td style="text-align:left;"> 7 (5.04%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 41 (25%) </td>
+   <td style="text-align:left;"> 9 (6.47%) </td>
+   
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 68 (41.46%) </td>
+   <td style="text-align:left;"> 18 (12.95%) </td>
+   
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 39 (23.78%) </td>
+   <td style="text-align:left;"> 105 (75.54%) </td>
+   
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 145) </td>
+   <td style="text-align:left;"> 0.51 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 234.5 (208.75, 267.25) </td>
+   <td style="text-align:left;"> 249 (217.5, 283.5) </td>
+   <td style="text-align:left;"> 0.11 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 161 (148.75, 172) </td>
+   <td style="text-align:left;"> 142 (125, 156.5) </td>
+   <td style="text-align:left;"> 0.08 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> ExerciseInducedAngina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 141 (85.98%) </td>
+   <td style="text-align:left;"> 63 (45.32%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 23 (14.02%) </td>
+   <td style="text-align:left;"> 76 (54.68%) </td>
+   
+  </tr>
+</tbody>
+</table>
+
+<p>The name of function in the list is what becomes the column label. </p>
+
+<p>The comparison will take place across the number of subgroups there are within the column stratification:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = ~ Sex + HeartDisease,
+    associations = list(`P-value` = pval)
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+<tr>
+<th style="border-bottom:hidden" colspan="2"></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Female</div></th>
+<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Male</div></th>
+<th style="border-bottom:hidden" colspan="1"></th>
+</tr>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+   <th style="text-align:left;"> P-value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+   <td style="text-align:left;"> 0.53 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="5"> ChestPain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+   
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+   
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+   
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 0.55 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+   <td style="text-align:left;"> 0.11 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+   <td style="text-align:left;"> 0.01 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> ExerciseInducedAngina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2">  </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+   
+  </tr>
+</tbody>
+</table>
+
+<p>However, using a row stratification makes the comparisons be <em>within</em> those groups:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    strata = Sex ~ HeartDisease,
+    associations = list(`P-value` = pval)
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Sex </th>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> No </th>
+   <th style="text-align:left;"> Yes </th>
+   <th style="text-align:left;"> P-value </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="12"> Female </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 54 (46, 63.25) </td>
+   <td style="text-align:left;"> 60 (57, 62) </td>
+   <td style="text-align:left;"> 0.17 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="5"> ChestPain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 4 (5.56%) </td>
+   <td style="text-align:left;"> 0 (0%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4">  </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 16 (22.22%) </td>
+   <td style="text-align:left;"> 2 (8%) </td>
+   
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (47.22%) </td>
+   <td style="text-align:left;"> 1 (4%) </td>
+   
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 18 (25%) </td>
+   <td style="text-align:left;"> 22 (88%) </td>
+   
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (119.5, 140) </td>
+   <td style="text-align:left;"> 140 (130, 158) </td>
+   <td style="text-align:left;"> 0.37 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 249 (210.75, 289.5) </td>
+   <td style="text-align:left;"> 268 (236, 307) </td>
+   <td style="text-align:left;"> 0.58 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 159 (146.75, 167.25) </td>
+   <td style="text-align:left;"> 146 (133, 157) </td>
+   <td style="text-align:left;"> 0.15 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> ExerciseInducedAngina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 64 (88.89%) </td>
+   <td style="text-align:left;"> 11 (44%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2">  </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 8 (11.11%) </td>
+   <td style="text-align:left;"> 14 (56%) </td>
+   
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="12"> Male </td>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 52 (44, 57) </td>
+   <td style="text-align:left;"> 57.5 (51, 61) </td>
+   <td style="text-align:left;"> 0.29 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="5"> ChestPain </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 12 (13.04%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4">  </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 25 (27.17%) </td>
+   <td style="text-align:left;"> 7 (6.14%) </td>
+   
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 34 (36.96%) </td>
+   <td style="text-align:left;"> 17 (14.91%) </td>
+   
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 21 (22.83%) </td>
+   <td style="text-align:left;"> 83 (72.81%) </td>
+   
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+   <td style="text-align:left;"> 0.71 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 229.5 (206.5, 250.75) </td>
+   <td style="text-align:left;"> 247.5 (212, 282) </td>
+   <td style="text-align:left;"> 0.11 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 163 (150, 175.75) </td>
+   <td style="text-align:left;"> 141 (125, 156) </td>
+   <td style="text-align:left;"> 0.26 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;vertical-align: top !important;" rowspan="3"> ExerciseInducedAngina </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 77 (83.7%) </td>
+   <td style="text-align:left;"> 52 (45.61%) </td>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2">  </td>
+  </tr>
+  <tr>
+   
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 15 (16.3%) </td>
+   <td style="text-align:left;"> 62 (54.39%) </td>
+   
+  </tr>
+</tbody>
+</table>
+
+<p>In general, there must be at least one column stratification variable in order to use association metrics. See <code>univariate_associations()</code> for more details on the workhorse of this functionality.</p>
+
+<h1>Backend functionality</h1>
+
+<p><code>descriptives()</code> is the function that drives the computation behind the statistics for the columns of the input dataset. Any of its arguments can be passed from <code>univariate_table()</code> to add further customization.</p>
+
+<h2>Specifying data types</h2>
+
+<p>As noted above, one of columns did not appear in the table by default because it was a <code>logical()</code> type. By default, only <code>factor()</code> and <code>numeric()</code> types are placed into the result, though there are (at least) three ways to include it:</p>
+
+<h3>Change column type prior to function call</h3>
+
+<p>You could simply just make the column a conformable type outside of the call:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  dplyr::mutate(
+    BloodSugar = factor(BloodSugar)
+  ) %&gt;%
+  univariate_table()
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> BloodSugar </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> 258 (85.15%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> TRUE </td>
+   <td style="text-align:left;"> 45 (14.85%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+<h3>Change scope of what column types are evaluated by what function sets</h3>
+
+<p>The <code>_types</code> arguments allow you to specify the data types that are to be interpreted by the high-level function call. Let&#39;s allow <code>logical()</code> types to be treated as a categorical variable:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    categorical_types = c(&quot;factor&quot;, &quot;logical&quot;)
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> BloodSugar </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> 258 (85.15%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> TRUE </td>
+   <td style="text-align:left;"> 45 (14.85%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+<h3>Allow evaluation by its own set of functions</h3>
+
+<p>The most flexible approach would be to define its own set of functions. By default, the data type of anything that is not interpreted as categorical or numeric is considered &ldquo;other&rdquo;. There is infrastruce in place to supply functions and summaries in the same manner for these columns.</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    f_other = list(count = function(x) table(x)),
+    other_summary = 
+      c(
+        Summary = &quot;count&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> BloodSugar </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 258 </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 45 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>You would need to also define functions for the percentages, proportions, etc. to exactly match the other examples.</p>
+
+<h2>Adding user-specified functions</h2>
+
+<p>You can also add custom functions that can be available for numeric or categorical columns:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    categorical_types = NULL,
+    f_numeric =
+      list(
+        cv = ~sd(.x) / mean(.x)
+      ),
+    numeric_summary = 
+      c(
+        `Coef. of variation` = &quot;sd / mean = cv&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Coef. of variation </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;"> 9.04 / 54.44 = 0.17 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;"> 17.6 / 131.69 = 0.13 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;"> 51.78 / 246.69 = 0.21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;"> 22.88 / 149.61 = 0.15 </td>
+  </tr>
+</tbody>
+</table>
+
+<p>The names of functions become the patterns that searched in the string templates.</p>
+
+<h1>Additional preferences</h1>
+
+<p>Finally, we&#39;ll look at a few of the appearance-related arguments. These can be applied with any combination of other arguments.</p>
+
+<h2>Rendering format</h2>
+
+<p>As mentioned above, the default format for the table is HTML, but you could choose an alternative with the <code>format</code> argument:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    format = &quot;none&quot;
+  )
+</code></pre>
+
+<pre><code>## # A tibble: 14 x 3
+##    Variable              Level            Summary         
+##    &lt;chr&gt;                 &lt;chr&gt;            &lt;chr&gt;           
+##  1 Age                   &quot;&quot;               56 (48, 61)     
+##  2 Sex                   Female           97 (32.01%)     
+##  3 &quot;&quot;                    Male             206 (67.99%)    
+##  4 ChestPain             Typical angina   23 (7.59%)      
+##  5 &quot;&quot;                    Atypical angina  50 (16.5%)      
+##  6 &quot;&quot;                    Non-anginal pain 86 (28.38%)     
+##  7 &quot;&quot;                    Asymptomatic     144 (47.52%)    
+##  8 BP                    &quot;&quot;               130 (120, 140)  
+##  9 Cholesterol           &quot;&quot;               241 (211, 275)  
+## 10 MaximumHR             &quot;&quot;               153 (133.5, 166)
+## 11 ExerciseInducedAngina No               204 (67.33%)    
+## 12 &quot;&quot;                    Yes              99 (32.67%)     
+## 13 HeartDisease          No               164 (54.13%)    
+## 14 &quot;&quot;                    Yes              139 (45.87%)
+</code></pre>
+
+<p>There are also options for <code>&quot;latex&quot;, &quot;pandoc&quot;, &quot;markdown&quot;</code>.</p>
+
+<h2>Relabeling, releveling and reordering</h2>
+
+<p>You can use the <code>labels</code> and <code>levels</code> arguments to add clean text to any of the variable or categorical level names, and the <code>order</code> argument to change the position of the variables in the result:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    labels = 
+      c(
+        Age = &quot;Age (years)&quot;,
+        ChestPain = &quot;Chest pain&quot;
+      ),
+    levels = 
+      list(
+        Sex =
+          c(
+            Male = &quot;M&quot;
+          )
+      ),
+    order = 
+      c(
+        &quot;BP&quot;,
+        &quot;Age&quot;,
+        &quot;Cholesterol&quot;
+      )
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Variable </th>
+   <th style="text-align:left;"> Level </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Age (years) </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> Chest pain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> M </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+</tbody>
+</table>
+
+<p>Notice you only need to specify values that need to be changed. Also, ordering is done with the original names even when relabeled.</p>
+
+<h2>Headers, fill values, and captions</h2>
+
+<p>The <code>variableName</code> and <code>levelName</code> arguments are used to change what the headers are for the column names and categorical levels, while <code>fill_blanks</code> determines what goes in empty cells. Finally, the <code>caption</code> argument specifies labels the entire table:</p>
+
+<pre><code class="r">heart_disease %&gt;%
+  univariate_table(
+    variableName = &quot;THESE ARE VARIABLES&quot;,
+    levelName = &quot;THESE ARE LEVELS&quot;,
+    fill_blanks = &quot;BLANK&quot;,
+    caption = &quot;HERE IS MY CAPTION&quot;
+  )
+</code></pre>
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>HERE IS MY CAPTION</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> THESE ARE VARIABLES </th>
+   <th style="text-align:left;"> THESE ARE LEVELS </th>
+   <th style="text-align:left;"> Summary </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Age </td>
+   <td style="text-align:left;"> BLANK </td>
+   <td style="text-align:left;"> 56 (48, 61) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
+   <td style="text-align:left;"> Female </td>
+   <td style="text-align:left;"> 97 (32.01%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Male </td>
+   <td style="text-align:left;"> 206 (67.99%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
+   <td style="text-align:left;"> Typical angina </td>
+   <td style="text-align:left;"> 23 (7.59%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Atypical angina </td>
+   <td style="text-align:left;"> 50 (16.5%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Non-anginal pain </td>
+   <td style="text-align:left;"> 86 (28.38%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Asymptomatic </td>
+   <td style="text-align:left;"> 144 (47.52%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> BP </td>
+   <td style="text-align:left;"> BLANK </td>
+   <td style="text-align:left;"> 130 (120, 140) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cholesterol </td>
+   <td style="text-align:left;"> BLANK </td>
+   <td style="text-align:left;"> 241 (211, 275) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MaximumHR </td>
+   <td style="text-align:left;"> BLANK </td>
+   <td style="text-align:left;"> 153 (133.5, 166) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 204 (67.33%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 99 (32.67%) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
+   <td style="text-align:left;"> No </td>
+   <td style="text-align:left;"> 164 (54.13%) </td>
+  </tr>
+  <tr>
+   
+   <td style="text-align:left;"> Yes </td>
+   <td style="text-align:left;"> 139 (45.87%) </td>
+  </tr>
+</tbody>
+</table>
+
+</body>
+
+</html>

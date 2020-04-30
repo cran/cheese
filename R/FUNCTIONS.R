@@ -1,1893 +1,2295 @@
-#Created: 2019-02-13
+#Created: 2019-10-14
+#Updated: 2020-02-12
 #Author: Alex Zajichek
 #Package: cheese
-#Description: Function definitions used internally and available externally
+#Description: Function definitions for the package
+
+#Name: actual_depth
+#Description: Compute the explicit mapping depth based on what is implied by the input
+actual_depth <-
+  function(
+    depth, #An abstract depth
+    ref #A reference value for adjusting depth
+  ) {
+    
+    #Check that inputs are numeric
+    if(!is.numeric(depth) | !is.numeric(ref))
+      stop("Inputs must be numeric.")
+    
+    #If depth is negative, subtract from ref
+    if(depth < 0) {
+      
+      #Use zero if it goes beyond
+      depth <- max(ref + depth, 0)
+      
+    } else {
+      
+      #Use maximum depth as the limit
+      depth <- min(depth, ref)
+      
+    }
+    
+    depth
+    
+  }
 
 #Name: divide
-#Description: Stratify a data frame, remove strata columns from each frame
+#Description: Stratify a data frame into a list
 divide <-
-    function(
-        data, #Any data set
-        by, #Character vector of variables/patterns to select variables
-        sep = "|" #Character to separate strata by
-    ) {
-        
-        #Get variables
-        selected_vars <-
-            data %>%
-            dplyr::select(by)
-        
-        data %>%
-            
-            #Separate into a list
-            split(
-                selected_vars,
-                sep = sep
-            ) %>%
-            
-            #Remove strata from frames
-            purrr::map(
-                ~.x %>% dplyr::select(-tidyselect::one_of(names(selected_vars)))
-            )
-        
+  function(
+    data, #A data frame
+    ..., #Variables to split by
+    depth = Inf, #Depth to split to; default to max depth
+    remove = TRUE, #Should stratification variables be removed?
+    drop = TRUE, #Should unused combinations be dropped?
+    sep = "|" #Character to separate levels when necessary
+  ) {
+    
+    #Splice variable names
+    selected_vars <-
+      tidyselect::eval_select(
+        rlang::expr(c(...)),
+        data
+      ) 
+    
+    #Return error if no split variables entered
+    if(length(selected_vars) == 0)
+      stop("No columns registered.")
+    
+    #Set values as names
+    selected_vars <- as.list(names(selected_vars))
+    
+    #Get the depth
+    depth <-
+      actual_depth(
+        depth = depth,
+        ref = length(selected_vars)
+      )
+    
+    #Return data if depth is 0
+    if(depth == 0) {
+      
+      #Give warning
+      warning("Split depth is 0; returning original data.")
+      
+      #Return original data as a tibble
+      return(data %>% tibble::as_tibble())
+      
     }
+    
+    #Pull elements past position 'depth' into position 'depth'
+    selected_vars[[depth]] <- 
+      selected_vars[seq.int(depth, length(selected_vars))] %>% 
+      purrr::flatten_chr()
+    
+    #Only keep up to desired depth
+    selected_vars <- selected_vars[seq_len(depth)]
+    
+    #Set initial list to start loop
+    data <-
+      data %>%
+      
+      #Convert to tibble
+      tibble::as_tibble() %>%
+      
+      #Split by first variable(s)
+      split(
+        dplyr::select(data, tidyselect::all_of(selected_vars[[1]])),
+        drop = drop,
+        sep = sep
+      )
+    
+    #If needed, loop to split at desired depth
+    if(depth > 1) {
+      
+      for(i in seq_len(depth - 1)) {
+        
+        data <-
+          data %>%
+          
+          #Split at leaf data frames
+          purrr::modify_depth(
+            .depth = i,
+            ~
+              .x %>%
+              split(
+                dplyr::select(.x, tidyselect::all_of(selected_vars[[i + 1]])),
+                drop = drop,
+                sep = sep
+              )
+          )
+        
+      }
+      
+    }
+    
+    #Remove all split variables if necessary
+    if(remove) {
+      
+      data <-
+        data %>%
+        
+        #Alter at the leaves
+        purrr::modify_depth(
+          .depth = depth,
+          ~
+            .x %>%
+            dplyr::select(
+              -tidyselect::all_of(
+                selected_vars %>% 
+                  purrr::flatten_chr()
+              )
+            )
+        )
+      
+    }
+    
+    #Return result
+    data
+    
+  }
+
+#Name: depths_string
+#Description: Create representation of elements satisfying a predicate in a list structure
+depths_string <-
+  function(
+    list, #A list, data frame or atomic vector
+    predicate, #A binary function
+    bare = TRUE, #Only continue on bare lists
+    ... #Additional arguments for 'predicate'
+  ) {
+    
+    #Check if function is supplied
+    if(missing(predicate))
+      stop("No predicate supplied.")
+    
+    #Get continuation function
+    continue <- rlang::is_list
+    if(bare)
+      continue <- rlang::is_bare_list
+    
+    #Check if elements satisfy the predicate
+    result <-
+      list %>%
+      purrr::map_lgl(
+        .f = predicate,
+        ...
+      )
+    
+    #Make vector of indices
+    index <- seq_along(result)
+    
+    #Merge indices with indicator
+    result <- ifelse(result, -1*index, index)
+    
+    #Check if next elements are lists
+    are_lists <- 
+      list %>% 
+      purrr::map_lgl(
+        .f = continue
+      )
+    
+    #Continue traversal for list elements only
+    if(any(are_lists)) {
+      
+      result <-
+        
+        c(
+          
+          #Recursive function call for list elements
+          result[are_lists] %>%
+            stringr::str_c(
+              list[are_lists] %>% 
+                purrr::map_chr(
+                  .f = depths_string, 
+                  predicate = predicate,
+                  bare = bare,
+                  ...
+                )
+            ),
+          
+          #Concatenate with indices of non-list elements
+          result[!are_lists]
+          
+        )[order(order(are_lists, decreasing = TRUE))]
+      
+    } 
+    
+    #Collapse indices and add boundaries
+    stringr::str_c(
+      "{",
+      stringr::str_c(
+        result,
+        collapse = ","
+      ),
+      "}"
+    )
+    
+  }
+
+#Name: depths
+#Description: Find the depths in a list structure that satisfy a predicate
+depths <-
+  function(
+    list, #A list, data frame or atomic vector
+    predicate, #A binary function
+    bare = TRUE, #Only continue on bare lists
+    ... #Additional arguments for 'predicate'
+  ) {
+    
+    #Get string representation of structure
+    string <-
+      depths_string(
+        list = list,
+        predicate = predicate,
+        bare = bare,
+        ...
+      )
+    
+    #Split input into vectors of characters
+    string <- strsplit(string, split = "")[[1]]
+    
+    #Get the depth of each character
+    result <- cumsum(string == "{") - cumsum(string == "}")
+    
+    #Return depths that satisfied the predicate
+    unique(result[string == "-"])
+    
+  }
+
+#Name: fasten
+#Description: Collapse a list of data frames of arbitrary depth to any depth
+fasten <-
+  function(
+    list, #A list with data frames at the leaves
+    into = NULL, #Character vector of variable names (use "" for NULL)
+    depth = 0 #Depth to collapse to
+  ) {
+    
+    #Check for a bare list
+    if(!rlang::is_bare_list(list))
+      stop("A bare list must be supplied.")
+    
+    #Find depth of leaves
+    bind_depth <- 
+      list %>%
+      
+      #Extract the depth
+      depths(
+        predicate = is.data.frame,
+        bare = TRUE
+      ) 
+    
+    #Check for a data frame
+    if(length(bind_depth) == 0)
+      stop("There must be data frames at the leaves.")
+    
+    #Check for single depth
+    if(length(bind_depth) > 1)
+      stop("All data frames must be at the same depth.")
+    
+    #Get implied depth
+    depth <-
+      actual_depth(
+        depth = depth,
+        ref = bind_depth
+      )
+    
+    #Return original list if no binding is needed
+    if(depth == bind_depth) {
+      
+      #Give warning
+      warning("Desired depth equal to current depth. Returning original list.")
+      
+      #Return original data as a tibble
+      return(list)
+      
+    }
+    
+    #Check if column names were provided
+    if(is.null(into)) {
+      
+      #Make vector of empty strings
+      into <- rep("", bind_depth - depth)
+      
+    } else {
+      
+      #Check if input is a character vector
+      if(!is.character(into)) {
+        
+        #Coerce to character
+        into <- as.character(into)
+        
+        #Give warning
+        warning("Coercing 'into' to character vector.")
+        
+      }
+      
+      #Check if enough column names were provided
+      if(length(into) < bind_depth - depth) {
+        
+        #Add on empty strings for sufficient length
+        into <- c(into, rep("", bind_depth - depth - length(into)))
+        
+      } else if(length(into) > bind_depth - depth) {
+        
+        #Give warning
+        warning(paste0(length(into), " column names given but only ", bind_depth - depth, " needed."))
+        
+        #Only take elements needed
+        into <- into[seq_len(bind_depth - depth)]
+        
+      }
+      
+    }
+    
+    #Loop to bind rows
+    while(bind_depth > depth) {
+      
+      #Get inner column name
+      .id <- into[length(into)]
+      
+      #Set to NULL if empty string
+      if(.id == "")
+        .id <- NULL
+      
+      if(bind_depth > 1) {
+        
+        list <-
+          list %>%
+          
+          #Bind in the interior of list
+          purrr::modify_depth(
+            .depth = bind_depth - 1,
+            dplyr::bind_rows,
+            .id = .id
+          )
+        
+      } else {
+        
+        list <-
+          list %>%
+          
+          #Bind at top level of list
+          dplyr::bind_rows(
+            .id = .id
+          )
+        
+      }
+      
+      #Move to next depth
+      bind_depth <- bind_depth - 1
+      
+      #Remove used column header
+      into <- into[-length(into)]
+      
+    }
+    
+    list
+    
+  }
+
+#Name: muddle
+#Description: Randomly permute some or all columns in a data frame
+muddle <-
+  function(
+    data, #A data frame
+    at, #Columns to permute
+    ... #Arguments to pass to 'sample'
+  ) {
+    
+    #Set to all columns if missing input
+    if(missing(at))
+      at <- names(data)
+    
+    #Splice variable names
+    selected_vars <-
+      tidyselect::eval_select(
+        rlang::enquo(at),
+        data
+      ) 
+    
+    #Return error if no split variables entered
+    if(length(selected_vars) == 0)
+      stop("No columns registered.")
+    
+    #Shuffle desired variables
+    data %>%
+      purrr::map_at(
+        selected_vars,
+        sample,
+        ...
+      ) %>%
+      
+      #Combine columns back together
+      dplyr::bind_cols()
+    
+  }
 
 #Name: stratiply
-#Description: Stratify a data frame, apply a function, and collect results
+#Description: Stratify a data frame and apply a function
 stratiply <-
-    function(
-        data, #Any data.frame
-        strata, #Stratification variables
-        f, #Function to apply to each strata
-        delimiter = "|", #Character to separate strata
-        bind = FALSE, #Should results be binded?
-        separate = FALSE, #Should strata be separated to original columns?
-        ... #Additional arguments to pass to f
-    ) { 
-        
-        #Get variables
-        strata <-
-            tidyselect::vars_select(
-                names(data),
-                strata
-            )
-        
-        results <-
-            data %>%
-            
-            #Divide frame
-            divide(
-                by = strata,
-                sep = delimiter
-            ) %>%
-            
-            #Apply function to each strata
-            purrr::map(f, ...)
-        
-        #Post-process
-        if(bind) {
-            
-            results <-
-                results %>%
-                dplyr::bind_rows(
-                    .id = ".strata"
-                )
-            
-            if(separate) {
-                
-                results <-
-                    results %>%
-                    tidyr::separate(
-                        col = .data$.strata,
-                        into = strata,
-                        sep = stringr::str_c("[", delimiter, "]"),
-                        convert = TRUE
-                    )
-                
-            } 
-            
-            results
-            
-        } else {
-            
-            results
-            
-        }
-        
-    }
-
-#Name: stretch
-#Description: Span one or more columns over many columns
-stretch <-
-    function(
-        data, #Any data set
-        keys, #Keys to spread across columns
-        keep = NULL, #Variables to keep as their own column
-        send = NULL, #Variables to send to other columns
-        join = dplyr::full_join, #How should data be joined across strata?
-        .sep = "_", #How should resulting columns separate keys?
-        extract_keys_as_header = FALSE, #Should the keys be returned as a list component separate from the data?
-        keep_keys_in_header = TRUE, #Should the keys be left in header when extracted?
-        ... #Arguments to pass to the joining function
-    ) {
-        
-        #Stratify data according to keys
-        results <-
-            data %>%
-            
-            #Divide data
-            divide(
-                by = keys,
-                sep = .sep
-            )
-        
-        #Stop if only 1 key
-        if(length(results) <= 1)
-            stop("Only 1 key found")
-        
-        #Get other variables
-        keep <-
-            tidyselect::vars_select(
-                names(results[[1]]),
-                keep
-            )
-        send <-
-            tidyselect::vars_select(
-                names(results[[1]]),
-                send
-            )
-        
-        #Remove overlapping send variables
-        if(any(send %in% keep)) {
-            
-            send <- send[!(send %in% keep)]
-            
-        }
-        
-        #Find set of variables to select from
-        if(length(keep) == 0) {
-            
-            if(length(send) == 0) {
-                
-                stop("keep and send cannot both be NULL")
-                
-            } else {
-                
-                #Send only matching columns, keep remaining as their own columns
-                keep <-
-                    tidyselect::vars_select(
-                        names(results[[1]]),
-                        -send
-                    )
-                
-            }
-            
-            
-        } else {
-            
-            #If both are supplied, remove unwanted columns from all frames
-            if(length(send) > 0) {
-                
-                results <-
-                    results %>%
-                    purrr::map(
-                        ~
-                            .x %>%
-                            dplyr::select(
-                                keep,
-                                send
-                            )
-                    )
-                
-            } else {
-                
-                #Making send list for later use
-                send <-
-                    tidyselect::vars_select(
-                        names(results[[1]]),
-                        -keep
-                    )
-                
-            }
-            
-        }
-        
-        results <-
-            
-            #Recursively join
-            purrr::reduce2(
-                .x = results[-1],
-                .y = names(results)[-1],
-                function(.w, .x, .y) {
-                    
-                    join(
-                        x = .w,
-                        y =
-                            .x %>%
-                            dplyr::rename_at(
-                                dplyr::vars(
-                                    -tidyselect::one_of(keep)
-                                ),
-                                function(.z) {
-                                    
-                                    if(length(send) == 1) {
-                                        
-                                        .y
-                                        
-                                    } else {
-                                        
-                                        stringr::str_c(.z, .sep, .y)
-                                        
-                                    }
-                                    
-                                }
-                            ),
-                        by = keep,
-                        ...
-                    )
-                    
-                },
-                .init =
-                    results[[1]] %>%
-                    dplyr::rename_at(
-                        dplyr::vars(
-                            -tidyselect::one_of(keep)
-                        ),
-                        function(.z) {
-                            
-                            if(length(send) == 1) {
-                                
-                                names(results)[1]
-                                
-                            } else {
-                                
-                                stringr::str_c(.z, .sep, names(results)[1])
-                                
-                            }
-                            
-                        }
-                    )
-            )
-        
-        #Extract keys and return list if requested
-        if(extract_keys_as_header & length(send) > 1) {
-            
-            #Remove header if requested
-            if(!keep_keys_in_header) {
-                
-                .result <- results
-                names(.result)[which(names(.result) %in% keep)] <-
-                    names(.result)[which(names(.result) %in% keep)] %>%
-                    stringr::str_remove(
-                        pattern = stringr::str_c("[", .sep, "].+")
-                    )
-                
-            } else {
-                
-                .result <- results
-                
-            }
-            
-            list(
-                
-                #Extract header created from the keys
-                .header =
-                    dplyr::if_else(
-                        names(results) %in% keep, " ", stringr::str_extract(names(results), stringr::str_c("[", .sep, "].+")) %>% stringr::str_sub(2)
-                    ),
-                
-                #Remove the key values from the result
-                .result = .result
-                
-            )
-            
-        } else {
-            
-            results
-            
-        }
-    }
+  function(
+    data, #Any data frame
+    f, #Function to apply to each strata
+    by, #Stratification variables
+    ... #Additional arguments to pass to f
+  ) { 
+    
+    #Check for a function
+    if(missing(f))
+      stop("No function supplied.")
+    
+    #Check for inputs
+    if(missing(by))
+      stop("No columns supplied.")
+    
+    #Splice variable names
+    selected_vars <-
+      tidyselect::eval_select(
+        rlang::enquo(by),
+        data
+      ) 
+    
+    #Return error if no split variables entered
+    if(length(selected_vars) == 0)
+      stop("No columns registered.")
+    
+    data <-
+      data %>%
+      
+      #Divide frame into a list
+      divide(tidyselect::all_of(selected_vars))
+    
+    #Find mapping depth
+    mapping_depth <-
+      data %>%
+      depths(
+        predicate = is.data.frame,
+        bare = TRUE
+      )
+    
+    #Evaluate function at desired depth
+    data %>%
+      purrr::map_depth(
+        .depth = mapping_depth,
+        .f = f,
+        ...
+      )
+    
+  }
 
 #Name: dish
-#Description: Dish out a function to parts of a data frame
+#Description: Evaluate a function on combinations of columns
 dish <-
-    function(
-        data, #Any data frame
-        f, #First argument is left, second argument is right
-        left = NULL, #Variables to be included in the left side of the function
-        right = NULL, #Variables to be included in the right side of the function
-        each_left = TRUE, #Should each left variable be evaluated individually?
-        each_right = TRUE, #Should each right variable be evaluated individually?
-        bind = FALSE, #Should results be binded together?
-        ...
-    ) {
+  function(
+    data, #A data frame
+    f, #A two-argument function
+    left, #Columns to be entered in arg1
+    right, #Columns to be entered in arg2
+    each_left = TRUE, #Should the left variables be entered individually as vectors?
+    each_right = TRUE, #Should the right variables be entered individually as vectors?
+    ... 
+  ) {
+    
+    #Check for function
+    if(missing(f))
+      stop("No function supplied.")
+    
+    #Check for left inputs
+    if(missing(left)) {
+      
+      #Check for right inputs
+      if(missing(right)) {
         
-        #Extract variables
+        #Set both sides to all variables
         left <-
-            tidyselect::vars_select(
-                names(data),
-                left
-            )
+          tidyselect::eval_select(
+            rlang::expr(names(data)),
+            data
+          )
+        
+        right <- left
+        
+      } else {
+        
+        #Splice right variables
         right <-
-            tidyselect::vars_select(
-                names(data),
-                right
-            )
+          tidyselect::eval_select(
+            rlang::enquo(right),
+            data
+          )
         
-        #Remove overlapping variables
-        if(any(right %in% left)) {
-            
-            right <- right[!(right %in% left)]
-            
-        }
+        #Check for registration
+        if(length(right) == 0)
+          stop("No right variables registered.")
         
-        #Create data sets
-        if(length(left) == 0) {
-            
-            if(length(right) == 0) {
-                
-                #Select everything for both sides
-                left <-
-                    data %>%
-                    dplyr::select(tidyselect::everything())
-                right <- left
-                
-            } else {
-                
-                #Left is everything not supplied in right
-                left <- 
-                    data %>%
-                    dplyr::select(-right)
-                right <-
-                    data %>%
-                    dplyr::select(right)
-                
-            }
-            
-        } else {
-            
-            if(length(right) == 0) {
-                
-                #Right is everything not in left
-                right <-
-                    data %>%
-                    dplyr::select(-left)
-                left <-
-                    data %>%
-                    dplyr::select(left)
-                
-            } else {
-                
-                #Select left variables
-                left <-
-                    data %>%
-                    dplyr::select(left)
-                
-                #Select right variables
-                right <-
-                    data %>%
-                    dplyr::select(right)
-                
-            }
-            
-        }
+        #Left variables are everything else
+        left <-
+          tidyselect::eval_select(
+            rlang::expr(names(data)[-right]),
+            data
+          )
         
-        if(each_left) {
-            
-            if(each_right) {
-                
-                #Apply function to each left hand variable and each right hand variable
-                left_eval <-
-                    left %>%
-                    purrr::map(
-                        function(.x) {
-                            
-                            right_eval <-
-                                right %>%
-                                purrr::map(
-                                    function(.y) f(.x, .y, ...)
-                                )
-                            
-                            #Check for binding
-                            if(bind) {
-                                right_eval %>%
-                                    dplyr::bind_rows(
-                                        .id = ".right"
-                                    )
-                            } else {
-                                
-                                right_eval
-                                
-                            }
-                            
-                        }
-                    )
-                
-                #Check for binding
-                if(bind) {
-                    
-                    left_eval %>%
-                        dplyr::bind_rows(
-                            .id = ".left"
-                        )
-                    
-                } else {
-                    
-                    left_eval
-                    
-                }
-                
-            } else {
-                
-                #Apply function to each left hand variable but full right hand set
-                left_eval <-
-                    left %>%
-                    purrr::map(
-                        function(.x) f(.x, right,...)
-                    )
-                
-                #Check for binding
-                if(bind) {
-                    
-                    left_eval %>%
-                        dplyr::bind_rows(
-                            .id = ".left"
-                        )
-                    
-                } else {
-                    
-                    left_eval
-                    
-                }
-                
-            }
-            
-        } else {
-            
-            if(each_right) {
-                
-                #Apply function to each right hand variable but full left hand side
-                right_eval <- 
-                    right %>%
-                    purrr::map(
-                        function(.x) f(left, .x,...)
-                    )
-                
-                #Check for binding
-                if(bind) {
-                    
-                    right_eval %>%
-                        dplyr::bind_rows(
-                            .id = ".right"
-                        )
-                    
-                } else {
-                    
-                    right_eval
-                    
-                }
-                
-            } else {
-                
-                #Give warning
-                if(bind)
-                    warning("Binding has no effect when 'each_left' and 'each_right' are FALSE")
-                
-                #Apply function to full left hand side and full right hand side
-                f(left, right, ...)
-                
-            }
-            
-        }
+      }
+      
+    } else {
+      
+      #Splice left variables
+      left <-
+        tidyselect::eval_select(
+          rlang::enquo(left),
+          data
+        )
+      
+      #Check for registration
+      if(length(left) == 0)
+        stop("No left variables registered.")
+      
+      #Check for right inputs
+      if(missing(right)) {
         
+        #Right variables are everything else
+        right <-
+          tidyselect::eval_select(
+            rlang::expr(names(data)[-left]),
+            data
+          )
+        
+      } else {
+        
+        #Splice right variables
+        right <-
+          tidyselect::eval_select(
+            rlang::enquo(right),
+            data
+          )
+        
+        #Check for registration
+        if(length(right) == 0)
+          stop("No right variables registered.")
+        
+      }
+      
     }
+    
+    #Select data subsets
+    left <- data %>% dplyr::select(tidyselect::all_of(left))
+    right <- data %>% dplyr::select(tidyselect::all_of(right))
+    
+    ###Evaluate function depending on 'each_' arguments
+    #Check for left evaluation
+    if(each_left) {
+      
+      #Check for right evaluation
+      if(each_right) {
+        
+        #Evaluate each left argument as a vector with each right argument as a vector
+        left %>%
+          
+          #For every left variable
+          purrr::map(
+            
+            #Evaluate the function for every right variable
+            function(.x)
+              right %>% purrr::map(function(.y) f(.x, .y, ...))
+            
+          )
+        
+      } else {
+        
+        #Evaluate each left argument as a vector with the right columns in a single data frame
+        left %>%
+          
+          #For every left variable
+          purrr::map(
+            
+            #Evaluate the function with the right data frame
+            function(.x) f(.x, right, ...)
+            
+          )
+        
+      }
+      
+    } else {
+      
+      #Check for right evaluation
+      if(each_right) {
+        
+        #Evaluate each right argument as a vector with the left columns in a single data frame
+        right %>%
+          
+          #For every right variable
+          purrr::map(
+            
+            #Evaluate the function with the left data frame
+            function(.x) f(left, .x,...)
+            
+          )
+        
+      } else {
+        
+        #Evaluate with a data frame of left columns and data frame of right columns
+        f(left, right, ...)
+        
+      }
+      
+    }
+    
+  }
 
 #Name: absorb
 #Description: Populate a custom text template with the values in a set of key-value pairs
 absorb <-
-    function(
-        key, #Variable with the keys
-        value, #Variable with the values
-        text, #Custom text template with explicit keys where values should be absorbed into
-        sep = "|", #Values will be separated by this in the result if there are duplicate keys
-        print = FALSE, #Should the recursion process be displayed?
-        evaluate = FALSE #Should the resulting string be evaluated as an R expression?
-    ) {
-        
-        #Check that inputs are the same length
-        if(length(key) != length(value))
-            stop("keys and values must have the same length")
-        
-        #Coerce the key to character
-        key <- as.character(key)
-        
-        #Map over each element of text
-        filled_text <-
-            text %>%
-            
-            purrr::map_chr(
-                function(.text_i) {
-                    
-                    #Print original text if desired
-                    if(print) 
-                        print(.text_i)
-                    
-                    #Send key to recursion process
-                    key %>%
-                        purrr::reduce(
-                            function(.x, .y) {
-                                
-                                #Fill value for this iteration
-                                .text_ij <- stringr::str_replace_all(.x, .y, stringr::str_c(value[key == .y], collapse = sep))
-                                
-                                #Print intermediate result if desired
-                                if(print)
-                                    print(.text_ij)
-                                
-                                
-                                .text_ij
-                                
-                            },
-                            .init = .text_i
-                        )
-                    
-                }
-            )
-        
-        #Evaluate if requested
-        if(evaluate) {
-            
-            filled_text %>%
-                purrr::map(
-                    ~
-                        eval(
-                            parse(
-                                text = .x
-                            )
-                        )
-                )
-            
-        } else {
-            
-            filled_text
-            
-        }
+  function(
+    key,
+    value,
+    text,
+    sep = "_",
+    trace = FALSE,
+    evaluate = FALSE
+  ) {
+    
+    #Check that lengths match
+    if(length(key) != length(value))
+      stop("Keys and values must hold the same number of elements.")
+    
+    #Check text is a character vector
+    if(!is.character(text))
+      stop("Text input must be a vector of character strings.")
+    
+    #Check for names
+    names <- names(text)
+    
+    #Put into data frame
+    lookup <-
+      tibble::tibble(
+        key = key,
+        value = value
+      ) %>%
+      
+      #Convert keys/values to character vectors
+      dplyr::mutate_all(
+        as.character
+      ) %>%
+      
+      #Concatenate values for each key
+      dplyr::group_by(
+        key
+      ) %>%
+      dplyr::summarise(
+        value = stringr::str_c(value, collapse = sep)
+      )
+    
+    #Repeat for each unique key
+    for(i in seq_len(nrow(lookup))) {
+      
+      #Trace if desired
+      if(trace)
+        cat(text, "\n")
+      
+      #Replace all substrings in text with values that match the key
+      text <- text %>% stringr::str_replace_all(pattern = lookup$key[i], replacement = lookup$value[i])
+      
     }
+    
+    #Restore names if provided
+    if(!is.null(names))
+      names(text) <- names
+    
+    #Evaluate expressions if necessary
+    if(evaluate)
+      text <- text %>% purrr::map(~eval(parse(text = .x)))
+    
+    #Return result
+    text
+    
+  }
 
-#Name: type_match
-#Description: Utility function to use in select columns
-type_match <-
-    function(
-        object,
-        types,
-        negated = FALSE
-    ) {
+#Name: some_type
+#Description: Does an object conform to one or more types?
+some_type <-
+  function(
+    object,
+    types
+  ) {
+    
+    #Check for inputs
+    if(missing(object))
+      stop("No object supplied")
+    
+    #Check for types
+    if(missing(types))
+      stop("No types supplied")
+    
+    #Loop through input
+    match_found <- FALSE
+    for(i in seq_along(types)) {
+      
+      #Check if object type conforms
+      if(methods::is(object, types[i])) {
         
-        #Apply to columns that DONT match
-        if(negated) {
-            
-            all(
-                types %>%
-                    purrr::map_lgl(
-                        ~!methods::is(object, .x)
-                    )
-            )
-            
-            #Apply to columns that do match        
-        } else {
-            
-            any(
-                types %>%
-                    purrr::map_lgl(
-                        ~methods::is(object, .x)
-                    )
-            )
-            
-        }
+        #Change status; exit loop
+        match_found <- TRUE
+        break
         
+      }
+      
     }
+    
+    #Return indicator
+    match_found
+    
+  }
 
 #Name: typly
-#Description: Apply a function for specified types
+#Description: Apply a function to columns conforming (or not) to the specified types
 typly <-
-    function(
-        data, #Any data set
-        types, #Character vector of data types to apply functions
-        f, #Function to apply
-        negated = FALSE, #Should the function be applied to variables not matching any types?
-        keep = FALSE, #Should non-matching columns be kept in result?
-        ... #Additional arguments passed to f
-    ) {
+  function(
+    data,
+    f,
+    types,
+    negated = FALSE,
+    ...
+  ) {
+    
+    #Check for a function
+    if(missing(f))
+      stop("No function supplied.")
+    
+    #Check for types
+    if(missing(types))
+      stop("No types supplied")
+    
+    #Test type matching
+    type_test <- 
+      data %>% 
+      
+      #Get a logical vector
+      purrr::map_lgl(
+        .f = some_type,
+        types = types
+      )
+    
+    #Negate if needed
+    if(negated)
+      type_test <- !type_test
+    
+    #If any conform, apply function
+    if(any(type_test)) {
+      
+      data %>%
         
-        #Filter columns if needed
-        if(!keep) {
-            
-            data[data %>% purrr::map_lgl(type_match, types = types, negated = negated)] %>%
-                
-                purrr::map(
-                    #Apply function
-                    function(.x) {
-                        
-                        #If argument is a function then evaluate
-                        if(methods::is(f, "function")) {
-                            
-                            f(.x, ...)
-                            
-                            #If list of functions are provided, evaluate each        
-                        } else {
-                            
-                            f %>%
-                                purrr::map(
-                                    function(.y) .y(.x, ...)
-                                )
-                            
-                        }
-                        
-                    }
-                )
-            
-        } else {
-            
-            data %>%
-                
-                #Only apply function if condition holds
-                purrr::map_if(
-                    function(.x) type_match(.x, types = types, negated = negated),
-                    
-                    #Apply function
-                    function(.x) {
-                        
-                        #If argument is a function then evaluate
-                        if(methods::is(f, "function")) {
-                            
-                            f(.x, ...)
-                            
-                            #If list of functions are provided, evaluate each        
-                        } else {
-                            
-                            f %>%
-                                purrr::map(
-                                    function(.y) .y(.x, ...)
-                                )
-                            
-                        }
-                        
-                    }
-                )
-        }
+        #Select columns with conforming types
+        dplyr::select_if(
+          type_test
+        ) %>%
+        
+        #Apply the function
+        purrr::map(
+          f,
+          ...
+        )
+      
+    } else {
+      
+      NULL
+      
     }
+    
+  }
+
+#Name: order_levels
+#Description: Returns order of combinations of levels
+order_levels <-
+  function(
+    data,
+    sep = "_"
+  ) {
+    
+    #Find set of unique values for each variable
+    sets <- 
+      data %>%
+      purrr::map(unique)
+    
+    #Get rank order of levels within each column
+    ranks <-
+      sets %>%
+      purrr::map_df(
+        ~
+          tibble::tibble(
+            name = as.character(.x),
+            value = order(.x)
+          ),
+        .id = "column"
+      )
+    
+    sets <-
+      sets %>%
+      
+      #Convert to character
+      purrr::map(as.character) %>%
+      
+      #Get cross-product for levels
+      purrr::cross_df()
+      
+    sets %>%
+      
+      #Add group identifier
+      dplyr::mutate(
+        .id = seq_len(nrow(sets))
+      ) %>%
+      
+      #Send down the rows
+      tidyr::gather(
+        key = "column",
+        value = "name",
+        -tidyselect::all_of(".id")
+      ) %>%
+      
+      #Get rank of each level within each column
+      dplyr::inner_join(
+        y = ranks,
+        by = c("column", "name")
+      ) %>%
+      
+      #Within each combination
+      dplyr::group_by_at(
+        tidyselect::all_of(".id")
+      ) %>%
+      
+      #Concatenate the levels
+      dplyr::summarise(
+        index = paste(.data$value, collapse = ""),
+        name = paste(.data$name, collapse = sep)
+      ) %>%
+      dplyr::ungroup() %>%
+      
+      #Keep rank and level
+      dplyr::transmute(
+        index = order(order(.data$index)),
+        name = .data$name
+      )
+    
+  }
+
+#Name: stretch
+#Description: Span keys and values across the columns
+stretch <-
+  function(
+    data,
+    key,
+    value,
+    sep = "_"
+  ) {
+    
+    #Check for keys
+    if(missing(key))
+      stop("No key(s) supplied.")
+    
+    #Splice the keys
+    key <-
+      tidyselect::eval_select(
+        rlang::enquo(key),
+        data
+      ) %>%
+      names
+    
+    #Gather column order for keys
+    column_order <-
+      data %>%
+      dplyr::select(
+        tidyselect::all_of(key)
+      ) %>%
+      order_levels(
+        sep = sep
+      )
+    
+    #Check for registration
+    if(length(key) == 0)
+      stop("No key(s) registered")
+    
+    #Check for values
+    if(missing(value))
+      stop("No value(s) supplied.")
+    
+    #Splice the keys
+    value <-
+      tidyselect::eval_select(
+        rlang::enquo(value),
+        data
+      ) %>% 
+      names
+    
+    #Check for registration
+    if(length(value) == 0)
+      stop("No value(s) registered")
+    
+    ##Create a single column for the keys
+    data <-
+      data %>%
+      
+      #Combine columns together
+      tidyr::unite(
+        col = ".key",
+        key,
+        sep = sep,
+        remove = TRUE
+      ) 
+    
+    #Filter column ordering to those existing in the data
+    column_order <-
+      column_order %>%
+      dplyr::filter(
+        .data$name %in% purrr::pluck(data, ".key")
+      )
+    
+    #Gather id variables
+    id_vars <- setdiff(names(data), c(".key", value))
+    
+    #Collect column ordering
+    temp_column_order <- tibble::tibble()
+    
+    #For each value column...
+    result <- list()
+    for(i in seq_along(value)) {
+      
+      #Extract the current value
+      value_i <- value[i]
+      
+      #Make a temporary data frame
+      temp_dat <-
+        data %>%
+        
+        #Remove all value columns except the current one
+        dplyr::select(
+          -tidyselect::all_of(
+            setdiff(value, value_i)
+          )
+        )
+      
+      #Append keys if needed
+      if(length(value) > 1) {
+        
+        temp_dat <-
+          temp_dat %>%
+          
+          #Append key column
+          dplyr::mutate_at(
+            ".key",
+            ~paste0(.x, sep, value_i)
+          )
+        
+        #Add to column ordering
+        temp_column_order <-
+          temp_column_order %>%
+          dplyr::bind_rows(
+            
+            column_order %>%
+              
+              #Append value name and add index
+              dplyr::mutate(
+                name = paste0(.data$name, sep, value_i),
+                val_index = i
+              )
+            
+          )
+        
+      }
+      
+      result[[i]] <-
+        temp_dat %>% 
+        
+        #Send this value across the columns
+        tidyr::spread(
+          key = ".key",
+          value = value[i]
+        ) 
+      
+    }
+    
+    #Combine based on presence of id columns
+    if(length(id_vars) > 0) {
+      
+      result <-
+        result %>%
+        
+        #Iteratively join
+        purrr::reduce(
+          .f = dplyr::inner_join,
+          by = id_vars
+        )
+      
+    } else {
+      
+      result <-
+        result %>%
+        dplyr::bind_cols()
+      
+    }
+    
+    #Find final sorting order
+    if(nrow(temp_column_order) == 0)
+      temp_column_order <- column_order
+    
+    column_order <-
+      temp_column_order %>%
+      
+      #Arrange by indices
+      dplyr::arrange_at(
+        dplyr::vars(
+          tidyselect::any_of(
+            c(
+              "index",
+              "val_index"
+            )
+          )
+        )
+      ) %>%
+      
+      #Extract vector
+      dplyr::pull(.data$name)
+    
+    #Rearrange the columns
+    result %>%
+      dplyr::select(
+        tidyselect::all_of(
+          c(
+            id_vars,
+            column_order
+          )
+        )
+      )
+  } 
+
+#Name: grable
+#Description: Make a hierarchical kable 
+grable <-
+  function(
+    data, #A dataset
+    at, #Columns to include in hierarchy
+    sep = "_", #Delimiter for parsing
+    reverse = FALSE, #Stack in opposite direction?
+    format = c("html", "latex"), #Rendering format
+    caption = NULL, #Table caption
+    ... #Arguments passed to kableExtra::kable_styling
+  ) {
+    
+    #Set to all columns if missing input
+    if(missing(at)) {
+      
+      #Extract all indices
+      at <- seq_along(names(data))
+      
+      #Set names
+      names(at) <- names(data)
+      
+    }
+    
+    #Splice variable names
+    selected_vars <-
+      tidyselect::eval_select(
+        rlang::enquo(at),
+        data
+      ) 
+    
+    #Return error if no split variables entered
+    if(length(selected_vars) == 0)
+      stop("No columns registered.")
+    
+    #Split to create header matrix
+    headers <- 
+      selected_vars %>% 
+      names %>% 
+      stringr::str_split(
+        pattern = sep,
+        simplify = TRUE
+      )
+    
+    #Iterable index vector
+    index <- rev(seq_len(ncol(headers)))
+    
+    #Reverse if needed
+    if(reverse)
+      index <- rev(index)
+    
+    #Replace names of data with first level
+    names(data)[selected_vars] <- headers[,index[1]]
+    
+    #Get format
+    format <- match.arg(format)
+    
+    #Make initial kable
+    result <-
+      data %>%
+      knitr::kable(
+        format = format,
+        caption = caption
+      ) %>%
+      kableExtra::kable_styling(...)
+    
+    #Iteratively add layers
+    if(length(index) > 1) {
+      
+      #Make a template
+      template <- rep(" ", ncol(data))
+      
+      for(i in 2:length(index)) {
+        
+        #Make index
+        temp_template <- template
+        temp_template[selected_vars] <- headers[,index[i]]
+        
+        #Add empty spots 
+        result <-
+          result %>%
+          kableExtra::add_header_above(
+            kableExtra::auto_index(
+              temp_template
+            )
+          )
+        
+      }
+      
+    }
+    
+    result
+    
+  }
+
+#Name: default_univariate_functions
+#Description: Provides list of functions for different types of data
+default_univariate_functions <-
+  function(useNA) {
+    
+    list(
+      
+      #Functions for all data
+      f_all =
+        list(
+          
+          length = length,
+          missing = ~sum(is.na(.)),
+          available = ~sum(!is.na(.)),
+          class = class,
+          unique = ~length(unique(.))
+          
+        ),
+      
+      #Functions for numeric data
+      f_numeric =
+        list(
+          
+          mean = ~mean(., na.rm = TRUE),
+          sd = ~sd(., na.rm = TRUE),
+          min = ~min(., na.rm = TRUE),
+          q1 = ~quantile(., .25, na.rm = TRUE),
+          median = ~median(., na.rm = TRUE),
+          q3 = ~quantile(., .75, na.rm = TRUE),
+          max = ~max(., na.rm = TRUE),
+          iqr = ~IQR(., na.rm = TRUE),
+          range = ~diff(range(., na.rm = TRUE))
+          
+        ),
+      
+      #Functions for categorical data
+      f_categorical =
+        list(
+          
+          count = ~table(., useNA = useNA),
+          proportion = ~prop.table(table(., useNA = useNA)),
+          percent = ~prop.table(table(., useNA = useNA))*100
+          
+        )
+      
+    ) %>%
+      
+      #Convert everything to a function
+      purrr::map_depth(
+        .depth = 2,
+        rlang::as_function
+      )
+    
+  }
+
+#Name: descriptives_component
+#Description: Internal function to build a subset of the descriptives() call for a given result
+descriptives_component <-
+  function(res, na_string) {
+    
+    #Check if the input is numeric or character
+    if(!some_type(res, c("numeric", "character", "logical", "Date", "table")))
+      stop("Function must return a an atomic vector or table.")
+    
+    #Check if result has names
+    names <- NA_character_
+    if(!is.null(names(res))) 
+      names <- dplyr::coalesce(names(res), na_string)
+    
+    #Extract values from a table
+    if(is.table(res))
+      res <- as.numeric(res)
+    
+    #Add result to a data frame
+    temp_result <-
+      tibble::tibble(
+        val_ind = seq_along(res),
+        val_lab = names,
+        val_dbl = res
+      )
+    
+    #Change label for non-numeric output
+    if(!some_type(res, "numeric"))
+      names(temp_result)[3] <- "val_chr"
+    
+    #Return results
+    temp_result
+    
+  }
 
 #Name: descriptives
 #Description: Compute descriptive statistics on columns of a data frame
 descriptives <-
-    function(
-        data,
-        f_all = NULL,
-        f_numeric = NULL,
-        numeric_types = "numeric",
-        f_categorical = NULL,
-        categorical_types = "factor",
-        f_other = NULL,
-        na.rm = TRUE,
-        useNA = c("ifany", "no", "always"),
-        round = 2
-    ) {
+  function(
+    data,
+    f_all = NULL,
+    f_numeric = NULL,
+    numeric_types = "numeric",
+    f_categorical = NULL,
+    categorical_types = "factor",
+    f_other = NULL,
+    useNA = c("ifany", "no", "always"),
+    round = 2,
+    na_string = "(missing)"
+  ) {
+    
+    #Get default functions
+    useNA <- match.arg(useNA)
+    default_functions <- default_univariate_functions(useNA = useNA)
+    
+    #Add user-specified functions
+    f_all <- c(f_all, default_functions$f_all)
+    f_numeric <- c(f_numeric, default_functions$f_numeric)
+    f_categorical <- c(f_categorical, default_functions$f_categorical)
+    
+    ###Evaluate functions for...
+    #All columns
+    all_results <-
+      f_all %>%
+      
+      #Apply each function to each column
+      purrr::map(
+        ~
+          data %>%
+          purrr::map(
+            .f = .x
+          )
+      )
+    
+    #Numeric columns
+    numeric_results <-
+      f_numeric %>%
+      
+      #Apply function for each type
+      purrr::map(
+        typly,
+        data = data,
+        types = numeric_types
+      ) 
+    
+    #Categorical columns
+    categorical_results <-
+      f_categorical %>%
+      
+      #Apply function for each type
+      purrr::map(
+        typly,
+        data = data,
+        types = categorical_types
+      )
+    
+    #Other columns
+    other_results <- NULL
+    if(!is.null(f_other)) {
+      
+      other_results <-
+        f_other %>%
         
-        ###Concantenate provided functions with default functions
-        #Functions to apply to all data
-        f_all <-
-            c(
-                list(
-                    length = function(x, ...) length(x),
-                    missing = function(x, ...) sum(is.na(x)),
-                    available = function(x, ...) sum(!is.na(x)),
-                    class = function(x, ...) class(x),
-                    unique = dplyr::n_distinct
-                ),
-                f_all
-            )
-        
-        #Functions to apply to numeric data
-        f_numeric <-
-            c(
-                f_all,
-                list(
-                    evaluated = function(x, ...) "continuous",
-                    mean = mean,
-                    sd = sd,
-                    min = min,
-                    median = median,
-                    iqr = IQR,
-                    max = max
-                ),
-                f_numeric
-            )
-        
-        #Functions to apply to categorical data
-        f_categorical <-
-            c(
-                f_all,
-                list(
-                    evaluated = function(x, ...) "categorical",
-                    count = table,
-                    percent = function(x, ...) prop.table(table(x, ...))*100
-                ),
-                f_categorical
-            )
-        
-        #Functions to apply to other data
-        f_other <-
-            c(
-                f_all,
-                list(
-                    evaluated = function(x) "other"
-                ),
-                f_other
-            )
-        
-        #Get NA argument
-        useNA <- match.arg(useNA)
-        
-        #Get summary
-        data %>%
-            
-            #Get numeric summaries
-            typly(
-                types = numeric_types,
-                f = f_numeric,
-                keep = TRUE,
-                na.rm = na.rm
-            ) %>%
-            
-            #Get categorical summaries
-            typly(
-                types = categorical_types,
-                f = f_categorical,
-                keep = TRUE,
-                useNA = useNA
-            ) %>%
-            
-            #Get remaining summaries
-            typly(
-                types = 
-                    setdiff(
-                        data %>%
-                            purrr::map(class) %>%
-                            purrr::flatten_chr(),
-                        c(numeric_types, categorical_types)
-                    ),
-                f_other,
-                keep = TRUE
-            ) %>%
-            
-            #Bind together
-            purrr::map_df(
-                ~.x %>%
-                    purrr::map_df(
-                        function(.y) {
-                            
-                            if(is.null(names(.y))) {
-                                
-                                if(any(c(numeric_types, "numeric") %>% purrr::map_lgl(function(.z) methods::is(.y, .z)))) {
-                                    
-                                    if(methods::is(.y, "numeric")) {
-                                        
-                                        tibble::tibble(
-                                            .value = .y
-                                        )
-                                        
-                                    } else {
-                                        
-                                        tibble::tibble(
-                                            .label = as.character(.y)
-                                        )
-                                        
-                                    }
-                                    
-                                } else {
-                                    
-                                    tibble::tibble(
-                                        .label = .y
-                                    )
-                                    
-                                }
-                                
-                            } else {
-                                
-                                tibble::tibble(
-                                    .level = names(.y),
-                                    .order = 1:length(.y),
-                                    .value = .y
-                                )
-                                
-                            }
-                            
-                        },
-                        .id = ".key"
-                    ),
-                .id = ".variable"
-            ) %>%
-            
-            #Make a new column with all labels/values
-            dplyr::mutate(
-                .combo =
-                    dplyr::case_when(
-                        !is.na(.value) ~ as.character(round(.value, round)),
-                        TRUE ~ .label
-                    )
-            )
+        #Apply function excluding each type
+        purrr::map(
+          typly,
+          data = data,
+          types = c(numeric_types, categorical_types),
+          negated = TRUE
+        )
+      
     }
+    
+    #Get column indices
+    columns <- names(data)
+    
+    #Build a data frame with the results
+    list(
+      all = all_results,
+      numeric = numeric_results,
+      categorical = categorical_results,
+      other = other_results
+    ) %>%
+      purrr::map_depth(
+        .depth = 3,
+        descriptives_component,
+        na_string = na_string
+      ) %>%
+      
+      #Bind columns
+      fasten(
+        into = c("fun_eval", "fun_key", "col_lab")
+      ) %>%
+      
+      #Join to get column order
+      dplyr::inner_join(
+        y =
+          tibble::tibble(
+            col_lab = columns,
+            col_ind = seq_along(columns)
+          ),
+        by = "col_lab"
+      ) %>%
+      
+      #Rearrange columns
+      dplyr::select(
+        tidyselect::all_of(
+          c(
+            "fun_eval",
+            "fun_key",
+            "col_ind",
+            "col_lab"
+          )
+        ),
+        tidyselect::everything()
+      ) %>%
+      
+      #Add consolidated summary column
+      dplyr::mutate(
+        val_cbn = dplyr::coalesce(as.character(round(.data$val_dbl, round)), .data$val_chr)
+      ) %>%
+      
+      #Rearrange rows
+      dplyr::arrange_at(
+        dplyr::vars(
+          tidyselect::all_of(
+            c(
+              "fun_eval",
+              "fun_key",
+              "col_ind",
+              "val_ind"
+            )
+          )
+        )
+      )
+  }
+
+#Name: univariate_associations
+#Description: Evaluate a list of functions to a variable for each response
+univariate_associations <-
+  function(
+    data,
+    f,
+    responses,
+    predictors
+  ) {
+    
+    #Check for function
+    if(missing(f))
+      stop("No function(s) supplied.")
+    
+    #Check for response inputs
+    if(missing(responses)) {
+      
+      #Check for predictor inputs
+      if(missing(predictors)) {
+        
+        #Set both sides to all variables
+        responses <-
+          tidyselect::eval_select(
+            rlang::expr(names(data)),
+            data
+          )
+        
+        predictors <- responses
+        
+      } else {
+        
+        #Splice predictor variables
+        predictors <-
+          tidyselect::eval_select(
+            rlang::enquo(predictors),
+            data
+          )
+        
+        #Check for registration
+        if(length(predictors) == 0)
+          stop("No predictor variables registered.")
+        
+        #Response variables are everything else
+        responses <-
+          tidyselect::eval_select(
+            rlang::expr(names(data)[-predictors]),
+            data
+          )
+        
+      }
+      
+    } else {
+      
+      #Splice response variables
+      responses <-
+        tidyselect::eval_select(
+          rlang::enquo(responses),
+          data
+        )
+      
+      #Check for registration
+      if(length(responses) == 0)
+        stop("No response variables registered.")
+      
+      #Check for predictor inputs
+      if(missing(predictors)) {
+        
+        #Predictor variables are everything else
+        predictors <-
+          tidyselect::eval_select(
+            rlang::expr(names(data)[-responses]),
+            data
+          )
+        
+      } else {
+        
+        #Splice predictor variables
+        predictors <-
+          tidyselect::eval_select(
+            rlang::enquo(predictors),
+            data
+          )
+        
+        #Check for registration
+        if(length(predictors) == 0)
+          stop("No predictor variables registered.")
+        
+      }
+      
+    }
+    
+    #Make f a list if its a single function
+    if(methods::is(f, "function"))
+      f <- list(f)
+    
+    f %>%
+      
+      #Map each function
+      purrr::imap(
+        ~
+          data %>% 
+          
+          #Get list of association statistics
+          dish(
+            f = .x,
+            left = tidyselect::all_of(responses),
+            right = tidyselect::all_of(predictors)
+          ) %>%
+          
+          #Convert result to tibble
+          purrr::map_depth(
+            .depth = 2,
+            ~
+              .x %>%
+              
+              #Make tibble
+              tibble::enframe(
+                value = "value"
+              ) %>%
+              
+              #Remove key
+              dplyr::select(
+                -tidyselect::all_of("name")
+              )
+          ) %>%
+          
+          #Zip up result
+          fasten(
+            into = c("response", "predictor")
+          ) %>%
+          
+          #Rename value to match function
+          dplyr::rename_at(
+            "value",
+            function(x) .y
+          )
+      ) %>%
+      
+      #Iteratively join
+      purrr::reduce(
+        dplyr::inner_join,
+        by =
+          c(
+            "response",
+            "predictor"
+          )
+      )
+  } 
 
 #Name: absorb_descriptive_variable
 #Description: Absorbs values into a custom text string for a specific variable produced by descriptives
 absorb_descriptive_variable <-
-    function(
-        variable,
-        numeric_summary,
-        categorical_summary,
-        other_summary,
-        all_summary,
-        evaluate
-    ) {
+  function(
+    variable,
+    numeric_summary,
+    categorical_summary,
+    other_summary,
+    all_summary,
+    evaluate
+  ) {
+    
+    #Vector function evaluation types
+    eval_types <- unique(variable$fun_eval)
+    
+    #Set parameters for summarizing
+    use_groups <- c("col_lab", "val_ind")
+    if("numeric" %in% eval_types) {
+      
+      use_summary <- numeric_summary
+      use_filter <- "numeric"
+      
+    } else if("categorical" %in% eval_types) {
+      
+      use_summary <- categorical_summary
+      use_filter <- "categorical"
+      use_groups <- c(use_groups, "val_lab")
+      
+    } else {
+      
+      use_summary <- other_summary
+      use_filter <- "other"
+      
+    }
+    
+    #Populate strings templates
+    results <-
+      variable %>%
+      
+      #Filter to categorical functions only
+      dplyr::filter(
+        .data$fun_eval %in% use_filter
+      )
+    
+    #Check if results exist
+    if(nrow(results) > 0) {
+      
+      results <-
+        results %>%
         
-        #Extract evaluation type
-        eval_type <-
-            variable %>%
-            dplyr::filter(.data$.key == "evaluated") %>%
-            dplyr::pull(.data$.combo)
+        #For each level
+        dplyr::group_by_at(
+          dplyr::vars(
+            tidyselect::all_of(use_groups)
+          )
+        ) %>%
         
-        #Summarise depending on type
-        if(eval_type %in% c("continuous", "other")) {
+        #Absorb the strings
+        dplyr::do(
+          absorb(
+            key = .data$fun_key,
+            value = .data$val_cbn,
+            text = use_summary,
+            evaluate = evaluate
+          ) %>%
             
-            #Choose the correct summary templates
-            use_summary <- numeric_summary
-            if(eval_type == "other")
-                use_summary <- other_summary
+            #Make a bindable tibble
+            as.list() %>%
+            purrr::map_df(~tibble::tibble(sum_val = as.character(.x)), .id = "sum_lab")
+        ) %>%
+        dplyr::ungroup()
+      
+    } else {
+      
+      results <- NULL
+      
+    }
+    
+    #Add all summary if requested
+    if(!is.null(all_summary)) {
+      
+      #Filter to subset with all functions
+      variable_all <-
+        variable %>%
+        dplyr::filter(
+          .data$fun_eval == "all"
+        )
+      
+      #Add extra row for categorical variables only
+      val_lab_all <- 1
+      if("categorical" %in% eval_types)
+        val_lab_all <- 0
+      
+      results <- 
+        results %>%
+        
+        #Bind additional summary to results
+        dplyr::bind_rows(
+          
+          absorb(
+            key = variable_all$fun_key,
+            value = variable_all$val_cbn,
+            text = all_summary,
+            evaluate = evaluate
+          ) %>%
             
-            #Absorb the computed functions into strings
-            results <-
-                absorb(
-                    key = variable$.key,
-                    value = variable$.combo,
-                    text = use_summary,
-                    evaluate = evaluate
-                ) %>%
-                
-                #Make a bindable tibble
-                as.list() %>%
-                dplyr::bind_cols()
+            #Make a bindable tibble
+            as.list() %>%
+            purrr::map_df(~tibble::tibble(sum_val = as.character(.x)), .id = "sum_lab") %>%
             
+            #Put index at zero
+            tibble::add_column(
+              col_lab = variable_all$col_lab[1],
+              val_ind = val_lab_all
+            )
+          
+        )
+      
+    }
+    
+    results
+    
+  }
+
+#Name: absorb_descriptives
+#Description: Gathers the absorbed descriptives for all variables
+absorb_descriptives <-
+  function(
+    data,
+    numeric_summary,
+    categorical_summary,
+    other_summary,
+    all_summary,
+    evaluate,
+    ...
+  ) {
+    
+    data %>%
+      
+      #Get descriptive statistics
+      descriptives(...) %>%
+      
+      #Absorb into text strings for each variable
+      stratiply(
+        f = absorb_descriptive_variable,
+        by = .data$col_ind,
+        numeric_summary = numeric_summary,
+        categorical_summary = categorical_summary,
+        other_summary = other_summary,
+        all_summary = all_summary,
+        evaluate = evaluate
+      ) %>%
+      
+      #Bind back together
+      dplyr::bind_rows(
+        .id = "col_ind"
+      ) %>%
+      
+      #Convert to factor to maintain order of summaries
+      dplyr::mutate(
+        sum_lab = forcats::as_factor(.data$sum_lab)
+      ) %>%
+      
+      #Spread over the columns
+      tidyr::spread(
+        key = .data$sum_lab,
+        value = .data$sum_val
+      ) 
+    
+  }
+
+#Name: f_add_n
+#Description: Internal function for compute sample size to avoid redundant code
+f_add_n <-
+  function(
+    result, #Data to add the sample size to
+    by, #Column to compute sample size for
+    data #Data to compute sample size on
+  ) {
+    
+    result %>%
+      
+      #Join to get sample size
+      dplyr::inner_join(
+        y = 
+          data %>%
+          
+          #Group by column strata
+          dplyr::group_by_at(
+            dplyr::vars(
+              tidyselect::all_of(by)
+            )
+          ) %>%
+          
+          #Compute sample size
+          dplyr::summarise(
+            col_N = dplyr::n()
+          ) %>%
+          dplyr::ungroup() %>%
+          
+          #Convert to character types
+          dplyr::mutate_at(
+            dplyr::vars(
+              tidyselect::all_of(by)
+            ),
+            as.character
+          ),
+        by = by
+      ) %>%
+      
+      #Concatenate sample size to last col_strata 
+      dplyr::mutate_at(
+        dplyr::vars(
+          tidyselect::all_of(by[length(by)])
+        ),
+        ~paste0(.x, " (N=", .data$col_N, ")")
+      ) %>%
+      
+      #Remove sample size column
+      dplyr::select(
+        -.data$col_N
+      )
+    
+  }
+
+#Name: remove_duplicates
+#Description: Internal function to replace duplicates with a specified value
+remove_duplicates <-
+  function(
+    results,
+    at,
+    fill_blanks,
+    groups = NULL
+  ) {
+    
+    #Group if non-null
+    if(!is.null(groups)) {
+      
+      results <-
+        results %>%
+        
+        #Remove duplicate values
+        dplyr::group_by_at(
+          dplyr::vars(
+            tidyselect::all_of(groups)
+          )
+        )
+      
+    }
+    
+    results %>%
+      
+      #Scope is the specified set
+      dplyr::mutate_at(
+        dplyr::vars(
+          tidyselect::all_of(at)
+        ),
+        ~
+          dplyr::case_when(
+            duplicated(as.character(.x)) ~ fill_blanks,
+            TRUE ~ as.character(.x)
+          )
+      ) %>%
+      dplyr::ungroup()
+    
+  }
+
+#Name: univariate_table
+#Description: Create a custom table with univariate descriptive statistics
+univariate_table <-
+  function(
+    data,
+    strata = NULL,
+    associations = NULL,
+    numeric_summary = c(Summary = "median (q1, q3)"),
+    categorical_summary = c(Summary = "count (percent%)"),
+    other_summary = NULL,
+    all_summary = NULL,
+    evaluate = FALSE,
+    add_n = FALSE,
+    order = NULL,
+    labels = NULL,
+    levels = NULL,
+    format = c("html", "latex", "markdown", "pandoc", "none"),
+    variableName = "Variable",
+    levelName = "Level",
+    sep = "_",
+    fill_blanks = "",
+    caption = NULL,
+    ...
+  ) {
+    
+    #Set default values
+    col_strata <- NULL
+    row_strata <- character(0)
+    
+    #Extract all stratification variables
+    strata_vars <- all.vars(strata)
+    
+    #Summarize entire data set if no stratification columns
+    if(length(strata_vars) == 0) {
+      
+      results <-
+        data %>%
+        absorb_descriptives(
+          numeric_summary = numeric_summary,
+          categorical_summary = categorical_summary,
+          other_summary = other_summary,
+          all_summary = all_summary,
+          evaluate = evaluate,
+          ...
+        )
+      
+      #Otherwise summarize within each group  
+    } else {
+      
+      results <-
+        data %>%
+        stratiply(
+          f = absorb_descriptives,
+          by = tidyselect::all_of(strata_vars),
+          numeric_summary = numeric_summary,
+          categorical_summary = categorical_summary,
+          other_summary = other_summary,
+          all_summary = all_summary,
+          evaluate = evaluate,
+          ...
+        ) %>%
+        
+        #Bind back together
+        fasten(
+          into = strata_vars
+        )
+      
+      #Differentiate row/column strata
+      col_strata <- colnames(attr(terms(strata), "factors"))
+      row_strata <- setdiff(strata_vars, col_strata)
+      
+    }
+    
+    #Compute stratification group sample size if requested
+    if(add_n) {
+      
+      #Check for column strata
+      if(!is.null(col_strata)) {
+        
+        #Call internal function
+        results <- f_add_n(results, col_strata, data)
+        
+      }
+      
+      #Check for row strata
+      if(length(row_strata) > 0) {
+        
+        #Call internal function
+        results <- f_add_n(results, row_strata, data)
+        
+      }
+      
+    }
+    
+    #Ensure all_summary are the last columns
+    if(!is.null(all_summary)) {
+      
+      results <-
+        results %>%
+        
+        #Remove then add to end
+        dplyr::select(
+          -tidyselect::any_of(names(all_summary)),
+          tidyselect::any_of(names(all_summary))
+        )
+      
+    }
+    
+    #Span results across columns
+    if(!is.null(col_strata)) {
+      
+      results <-
+        results %>%
+        
+        #Convert to factor to maintain order
+        dplyr::mutate_at(
+          dplyr::vars(
+            tidyselect::all_of(col_strata)
+          ),
+          forcats::as_factor
+        ) %>%
+        
+        #Send all results across by the strata
+        stretch(
+          key = tidyselect::all_of(col_strata),
+          value = -tidyselect::any_of(c(row_strata, col_strata, "col_ind", "col_lab", "val_ind", "val_lab"))
+        )
+      
+    }
+    
+    #Gather association metrics
+    association_results <- NULL
+    if(!is.null(associations)) {
+      
+      #Ensure column strata are available
+      if(is.null(col_strata)) {
+        
+        #Give a warning 
+        warning("Association metrics can only be computed with column strata present.")
+        
+      } else {
+        
+        #Create secondary dataset
+        temp_data <-
+          data %>%
+          
+          #Combine column strata so they are compared across all groups
+          tidyr::unite(
+            col = "col_strata",
+            tidyselect::all_of(col_strata),
+            sep = sep
+          )
+        
+        #If there are row strata, run association metrics within
+        if(length(row_strata) > 0) {
+          
+          #Append the sample size to the row strata variable so joining works
+          if(add_n) {
+            
+            #Convert to character to avoid warning
+            temp_data <-
+              temp_data %>%
+              dplyr::mutate_at(
+                dplyr::vars(
+                  tidyselect::all_of(row_strata)
+                ),
+                as.character
+              )
+            
+            #Call internal function
+            temp_data <- f_add_n(temp_data, row_strata, temp_data)
+            
+          }
+          
+          association_results <-
+            temp_data %>%
+            
+            #Evaluate functions on each row strata
+            stratiply(
+              f = univariate_associations,
+              by = tidyselect::all_of(row_strata),
+              associations,
+              predictors = tidyselect::all_of("col_strata")
+            ) %>%
+            
+            #Bind results together
+            fasten(
+              into = row_strata
+            ) 
+          
         } else {
+          
+          association_results <-
+            temp_data %>%
+            univariate_associations(
+              f = associations,
+              predictors = tidyselect::all_of("col_strata")
+            )
+          
+        }
+        
+        #Determine index to join on depending on type (0 for categorical, 1 for everything else)
+        association_results$val_ind <- as.numeric(!(association_results$response %in% unique(results$col_lab[results$val_ind != 1])))
+        
+        #Extract the col_ind to maintain order
+        association_results <-
+          association_results %>%
+          
+          #Join with distinct labels/indices
+          dplyr::inner_join(
+            y = 
+              results %>%
+              
+              #Get distinct col_ind, col_labs
+              dplyr::select(
+                .data$col_ind,
+                .data$col_lab
+              ) %>%
+              dplyr::distinct(),
+            by = c("response" = "col_lab")
+          ) %>%
+          
+          #Remove predictor column
+          dplyr::select(
+            -.data$predictor
+          )
+        
+        #Join back to results
+        results <-
+          results %>%
+          
+          #Join on required columns
+          dplyr::full_join(
+            y = association_results,
+            by = c(row_strata, "col_ind", "col_lab" = "response", "val_ind")
+          )
+        
+      }
+      
+    }
+    
+    #Reassign col_ind if needed
+    if(!is.null(order)) {
+      
+      results <-
+        results %>%
+        dplyr::mutate(
+          
+          #Convert to factor and apply releveling
+          col_lab = forcats::fct_relevel(factor(.data$col_lab), order),
+          
+          #Get numeric order
+          col_ind = as.numeric(.data$col_lab),
+          
+          #Convert back to character
+          col_lab = as.character(.data$col_lab)
+          
+        )
+      
+    }
+    
+    #Relevel if requested
+    if(!is.null(levels)) {
+      
+      results <-
+        results %>%
+        
+        #Keep all result rows
+        dplyr::left_join(
+          y =
+            levels %>%
+            
+            #Convert each vector to a data frame
+            purrr::map_df(
+              tibble::enframe,
+              name = "val_lab",
+              value = "val_lab_new",
+              .id = "col_lab"
+            ),
+          by = c("col_lab", "val_lab")
+        ) %>%
+        
+        #Replace levels with new levels if present
+        dplyr::mutate(
+          val_lab = dplyr::coalesce(.data$val_lab_new, .data$val_lab)
+        ) %>%
+        
+        #Remove column of new labels
+        dplyr::select(
+          -.data$val_lab_new
+        )
+      
+    }
+    
+    #Relabel if requested
+    if(!is.null(labels)) {
+      
+      results <-
+        results %>%
+        
+        #Keep all result rows
+        dplyr::left_join(
+          y = 
+            labels %>%
+            tibble::enframe(
+              name = "col_lab",
+              value = "col_lab_new"
+            ),
+          by = "col_lab"
+        ) %>%
+        
+        #Replace labels with new labels if present
+        dplyr::mutate(
+          col_lab = dplyr::coalesce(.data$col_lab_new, .data$col_lab)
+        ) %>%
+        
+        #Remove new labels
+        dplyr::select(
+          -.data$col_lab_new
+        )
+      
+    }
+    
+    #Arrange results by indices
+    results <-
+      results %>%
+      dplyr::arrange_at(
+        dplyr::vars(
+          tidyselect::all_of(c(row_strata, "col_ind", "val_ind"))
+        )
+      ) %>%
+      
+      #Remove index columns
+      dplyr::select(
+        -.data$col_ind,
+        -.data$val_ind
+      ) %>%
+      
+      #Provide specified column names
+      dplyr::rename_all(
+        dplyr::recode,
+        col_lab = variableName,
+        val_lab = levelName
+      ) %>%
+      
+      #Fill in empty values
+      dplyr::mutate_if(
+        is.character,
+        dplyr::coalesce,
+        fill_blanks
+      )
+    
+    #Proceed depending on render format
+    format <- match.arg(format)
+    if(format %in% c("html", "latex")) {
+      
+      #Make sequences up to collapse
+      collapse_set1 <- seq_len(which(names(results) == variableName))
+      collapse_set2 <- NULL
+      if(!is.null(associations) & !is.null(col_strata))
+        collapse_set2 <- which(names(results) %in% setdiff(names(association_results), c(row_strata, "col_lab", "response")))
+      
+      #If there are no col strata, make kable
+      if(is.null(col_strata)) {
+        
+        results <-
+          results %>%
+          knitr::kable(
+            format = format,
+            caption = caption
+          ) %>%
+          kableExtra::kable_styling(
+            full_width = FALSE
+          )
+        
+      } else {
+        
+        #Make a grable
+        results <-
+          results %>%
+          grable(
+            at = -tidyselect::any_of(c(row_strata, variableName, levelName, names(association_results))),
+            sep = sep,
+            format = format,
+            caption = caption,
+            full_width = FALSE
+          ) 
+        
+      }
+      
+      #Remove duplicate rows
+      results %>%
+        kableExtra::collapse_rows(c(collapse_set1, collapse_set2), valign = "top")
+      
+    } else {
+      
+      #Remove duplicate association metrics
+      if(!is.null(associations)) {
+        
+        results <-
+          
+          #Call internal function
+          remove_duplicates(
+            results = results,
+            at = setdiff(names(association_results), c(row_strata, "col_lab", "response", "val_ind", "col_ind")),
+            fill_blanks = fill_blanks,
+            groups = c(row_strata, variableName)
+          )
+        
+      }
+      
+      #Apply within row strata
+      if(length(row_strata) > 0) {
+        
+        results <-
+          results %>%
+          
+          #Group by row strata
+          dplyr::group_by_at(
+            dplyr::vars(
+              tidyselect::all_of(row_strata)
+            )
+          )
+        
+      }
+      
+      #Remove duplicate variable names
+      results <-
+        
+        #Call internal function
+        remove_duplicates(
+          results = results,
+          at = variableName,
+          fill_blanks = fill_blanks
+        )
+      
+      #Remove duplicate row strata if needed
+      if(length(row_strata) > 0) {
+        
+        #Iteratively group and remove if needed
+        if(length(row_strata) > 1) {
+          
+          for(i in rev(seq_len(length(row_strata) - 1))) {
             
             results <-
-                variable %>%
-                
-                #Only keep the spots where there is a factor level
-                dplyr::filter(!is.na(.data$.order)) %>%
-                
-                #Convert the NA level to a string so it splits
-                dplyr::mutate(
-                    .level =
-                        dplyr::case_when(
-                            is.na(.data$.level) ~ "NA",
-                            TRUE ~ .data$.level
-                        )
-                ) %>%
-                
-                #Split by the level
-                stratiply(
-                    strata = ".level",
-                    f =
-                        function(.level) {
-                            
-                            #Absorb the summary on each level
-                            absorb(
-                                key = .level$.key,
-                                value = .level$.combo,
-                                text = categorical_summary,
-                                evaluate = evaluate
-                            ) %>%
-                                
-                                #Convert to binable tibble
-                                as.list() %>%
-                                dplyr::bind_cols() %>%
-                                
-                                #Maintain the order
-                                dplyr::bind_cols(
-                                    .level %>%
-                                        dplyr::select(.data$.order) %>%
-                                        dplyr::distinct()
-                                )
-                            
-                        },
-                    
-                    #Bind the summaries together over the levels
-                    bind = TRUE,
-                    separate = TRUE
-                ) %>%
-                dplyr::mutate(
-                    .level = as.character(.data$.level)
-                )
-        } 
-        
-        #Add the summaries that should be applied to all variables
-        if(!is.null(all_summary)) {
+              
+              #Call internal function
+              remove_duplicates(
+                results = results,
+                at = row_strata[i + 1],
+                fill_blanks = fill_blanks,
+                groups = row_strata[seq_len(i)]
+              )
             
-            #Allow absorption of all keys
-            results_all <-
-                absorb(
-                    key = variable$.key,
-                    value = variable$.combo,
-                    text = all_summary,
-                    evaluate = evaluate
-                ) %>%
-                
-                #Make bindable tibble
-                as.list() %>%
-                dplyr::bind_cols()
-            
-            if(eval_type == "categorical") {
-                
-                results <-
-                    results %>%
-                    
-                    #Create an extra row for categorical variables so summaries are not lined up with levels
-                    dplyr::bind_rows(
-                        results_all %>%
-                            
-                            #Add index to maintain order
-                            dplyr::mutate(
-                                .order = 0
-                            )
-                    )
-                
-                
-            } else {
-                
-                results <-
-                    results %>%
-                    
-                    #For other variables, just add the summary to new columns
-                    dplyr::bind_cols(
-                        results_all
-                    )
-                
-            }
-            
+          }
+          
         }
+        
+        #Remove duplicate for remaining row strata
+        results <-
+          
+          #Call internal function
+          remove_duplicates(
+            results = results,
+            at = row_strata[1],
+            fill_blanks = fill_blanks
+          )
+        
+      }
+      
+      #Return frame if no format requested
+      if(format == "none") {
         
         results
         
+      } else {
+        
+        results %>%
+          knitr::kable(
+            format = format,
+            caption = caption
+          )
+        
+      }
+      
     }
-
-#Name: absorb_descriptives
-#Description: Calls absorb_descriptive_variable for each variable and arranges columns
-absorb_descriptives <-
-    function(
-        variables,
-        numeric_summary,
-        categorical_summary,
-        other_summary,
-        all_summary,
-        evaluate
-    ) {
-        
-        temp_results <-
-            variables %>%
-            
-            #Separate computed statistics by each variable and absorb values into string templates
-            stratiply(
-                strata = ".variable",
-                absorb_descriptive_variable,
-                bind = TRUE,
-                separate = TRUE,
-                numeric_summary = numeric_summary,
-                categorical_summary = categorical_summary,
-                other_summary = other_summary,
-                all_summary = all_summary,
-                evaluate = evaluate
-            ) %>%
-            
-            #Rearrange the variables into a logical order
-            dplyr::select(
-                .data$.variable,
-                tidyselect::matches("^[.](level|order)$"),
-                tidyselect::everything()
-            )
-        
-        #Reorder factor levels
-        if(".order" %in% names(temp_results)) {
-            
-            temp_results <-
-                temp_results %>%
-                
-                #Group by the variable
-                dplyr::group_by(.data$.variable) %>%
-                
-                #Arrange by order
-                dplyr::arrange(.data$.order, .by_group = TRUE) %>%
-                dplyr::ungroup()
-            
-        }
-        
-        temp_results
-        
-    }
-
-#Name: associations
-#Description: Apply a list of functions to a variable for each response
-univariate_associations <-
-    function(
-        data,
-        f,
-        responses = NULL,
-        predictors = NULL
-    ) {
-        
-        #Make f a list if its a single function
-        if(methods::is(f, "function")) {
-            f <- list(f)
-        }
-        
-        f %>%
-            
-            #Map each function
-            purrr::imap(
-                ~
-                    data %>% 
-                    dish(
-                        .x,
-                        left = responses,
-                        right = predictors,
-                        bind = TRUE
-                    ) %>%
-                    
-                    #Remove .right
-                    dplyr::select(-.data$.right) %>%
-                    
-                    #Gather results
-                    tidyr::gather(
-                        key = .variable,
-                        value = .y,
-                        -.data$.left
-                    ) %>%
-                    
-                    #Rename result as function name
-                    dplyr::rename_at(
-                        ".y",
-                        function(.z) .y
-                    )
-            ) %>%
-            
-            #Recursively join on common columns
-            purrr::reduce(
-                dplyr::inner_join,
-                by = c(".left", ".variable")
-            ) %>%
-            
-            #Convert to factor to maintain order
-            dplyr::mutate(
-                .left = forcats::as_factor(.data$.left)
-            ) %>%
-            
-            #Arrange by outcome
-            dplyr::arrange(
-                .data$.left
-            )
-    }
-
-#Name: univariate_table
-#Description: Compute a custom univariate summary table for a dataset
-univariate_table <-
-    function(
-        data, 
-        strata = NULL,
-        associations = NULL,
-        numeric_summary = c(Summary = "median (iqr)"),
-        categorical_summary = c(Summary = "count (percent%)"),
-        other_summary = c(Summary = "unique"),
-        all_summary = NULL,
-        evaluate = FALSE,
-        add_n = FALSE,
-        order = NULL,
-        labels = NULL,
-        levels = NULL,
-        format = c("html", "latex", "markdown", "pandoc", "none"),
-        variableName = "Variable",
-        levelName = "Level",
-        na_string = "(missing)",
-        strata_sep = "/",
-        summary_strata_sep = "_",
-        fill_blanks = "",
-        caption = NULL,
-        ...
-    ) {
-        
-        #Function that retrieves raw summary
-        base_summary <-
-            function(.data) {
-                
-                .data %>%
-                    
-                    #Compute descriptive statistics passing arguments
-                    descriptives(...) %>%
-                    
-                    #Absorb the values into the string templates
-                    absorb_descriptives(
-                        numeric_summary = numeric_summary,
-                        categorical_summary = categorical_summary,
-                        other_summary = other_summary,
-                        all_summary = all_summary,
-                        evaluate = evaluate
-                    )
-                
-            }
-        
-        #Create some default values for later use
-        col_strata <- NULL
-        row_strata <- NULL
-        header <- NULL
-        association_names <- NULL
-        
-        #Retrieve base summary
-        if(is.null(strata)) {
-            
-            results <-
-                data %>%
-                base_summary
-            
-        } else {
-            
-            results <-
-                data %>%
-                
-                #Obtain summary for each strata combination
-                stratiply(
-                    
-                    #Extract all variables
-                    strata = all.vars(strata),
-                    
-                    #Send delimiter
-                    delimiter = strata_sep,
-                    
-                    #Base summary on each strata
-                    f = base_summary,
-                    
-                    #Bind results back together
-                    bind = TRUE,
-                    
-                    #Separate strata to original columns
-                    separate = TRUE
-                    
-                )
-            
-            ###Tease out row vs. column strata
-            #All row strata
-            if(length(attr(terms(strata), "factors")) == 0) {
-                
-                #Assign non-null value
-                row_strata <- all.vars(strata)
-                
-                #Combine all strata to a single column
-                results <-
-                    results %>%
-                    tidyr::unite(
-                        col = ".row_strata",
-                        row_strata,
-                        sep = strata_sep
-                    )
-                
-            #All column strata    
-            } else if(attr(terms(strata), "response") == 0) {
-                
-                #Assign non-null value
-                col_strata <- all.vars(strata)
-                
-                #Unite all strata to single variable
-                results <-
-                    results %>%
-                    tidyr::unite(
-                        col = ".col_strata",
-                        col_strata,
-                        sep = strata_sep
-                    )
-                
-            #Row and column strata
-            } else {
-                
-                #Assign non-null values
-                col_strata <-
-                    colnames(
-                        attr(terms(strata), "factors")
-                    )
-                row_strata <-
-                    setdiff(
-                        all.vars(strata),
-                        col_strata
-                    )
-                
-                #Unite columns to respective strata
-                results <-
-                    results %>%
-                    tidyr::unite(
-                        col = ".row_strata",
-                        row_strata,
-                        sep = strata_sep
-                    ) %>%
-                    tidyr::unite(
-                        col = ".col_strata",
-                        col_strata,
-                        sep = strata_sep
-                    )
-                
-            }
-            
-            #Convert strata variables to factors
-            results <-
-                results %>%
-                dplyr::mutate_at(
-                    dplyr::vars(
-                        tidyselect::matches("^[.](row_strata|col_strata)$")
-                    ),
-                    forcats::as_factor
-                )
-            
-            #Add a sample size if requested
-            if(add_n) {
-                
-                get_n <-
-                    function(.strat, .colname) {
-                        
-                        data %>%
-                            
-                            #Group by stratification variables
-                            dplyr::group_by_at(.strat) %>%
-                            
-                            #Compute sample size
-                            dplyr::summarise(.n = dplyr::n()) %>%
-                            dplyr::ungroup() %>%
-                            
-                            #Remove NA levels
-                            na.omit() %>%
-                            
-                            #Combine columns to match with results
-                            tidyr::unite_(
-                                col = .colname,
-                                .strat,
-                                sep = strata_sep
-                            ) %>%
-                            
-                            #Make factor for type matching
-                            dplyr::mutate_at(
-                                .colname,
-                                function(.z) {
-                                    
-                                    forcats::fct_relevel(
-                                        factor(.z),
-                                        
-                                        #Get current levels
-                                        results %>% 
-                                            dplyr::pull(.colname) %>%
-                                            levels()
-                                    )
-                                    
-                                }
-                            )
-                        
-                    }
-                
-                #Retrieve for row strata
-                if(!is.null(row_strata)) {
-                    
-                    results <-
-                        results %>%
-                        
-                        #Call temporary function and join
-                        dplyr::inner_join(
-                            y =
-                                get_n(
-                                    .strat = row_strata,
-                                    .colname = ".row_strata"
-                                ),
-                            by = ".row_strata"
-                        ) %>%
-                        
-                        #Concatenate sample size and remove
-                        dplyr::mutate(
-                            .row_strata =
-                                stringr::str_c(
-                                    .data$.row_strata, " (N=", .data$.n, ")"
-                                ) %>%
-                                forcats::as_factor()
-                        ) %>%
-                        dplyr::select(-.data$.n)
-                    
-                }
-                
-                #Retrieve for column strata
-                if(!is.null(col_strata)) {
-                    
-                    results <-
-                        results %>%
-                        dplyr::inner_join(
-                            y =
-                                get_n(
-                                    .strat = col_strata,
-                                    .colname = ".col_strata"
-                                ),
-                            by = ".col_strata"
-                        ) %>%
-                        
-                        #Concatenate sample size and remove
-                        dplyr::mutate(
-                            .col_strata =
-                                stringr::str_c(
-                                    .data$.col_strata, " (N=", .data$.n, ")"
-                                ) %>%
-                                forcats::as_factor()
-                        ) %>%
-                        dplyr::select(-.data$.n)
-                    
-                }
-                
-            }
-            
-            #Span summaries across the columns
-            if(!is.null(col_strata)) {
-                
-                results <-
-                    results %>%
-                    stretch(
-                        keys = ".col_strata",
-                        keep = tidyselect::matches("^[.](row_strata|variable|level|order)"),
-                        .sep = summary_strata_sep,
-                        extract_keys_as_header = TRUE
-                    )
-                
-                #Check if multiple columns were spanned
-                if(methods::is(results, "list")) {
-                    
-                    #Get base header
-                    header <- results$.header
-                    
-                    #Set results
-                    results <- results$.result
-                    
-                }
-                
-                #Compute association statistics if requested
-                if(!is.null(associations)) {
-                    
-                    #Temporary function to extract association statistics
-                    get_associations <-
-                        function(.d) {
-                            
-                            .d %>%
-                                
-                                #Combine columns
-                                tidyr::unite(
-                                    col = ".col_strata",
-                                    col_strata,
-                                    sep = strata_sep
-                                ) %>%
-                                
-                                #Get metrics
-                                univariate_associations(
-                                    f = associations,
-                                    responses = ".col_strata"
-                                ) %>%
-                                
-                                #Remove response column
-                                dplyr::select(-.data$.left)
-                            
-                        }
-                    
-                    #Check for row strata
-                    if(is.null(row_strata)) {
-                        
-                        #Obtain associations on entire data
-                        association_results <-
-                            data %>%
-                            get_associations
-                        
-                        #Join with results
-                        results <-
-                            results %>%
-                            dplyr::inner_join(
-                                y = association_results,
-                                by = ".variable"
-                            )
-                        
-                    } else {
-                        
-                        #Add temporary column to join by in case of sample size
-                        if(add_n) {
-                            
-                            results <-
-                                results %>%
-                                
-                                #Parse out the sample size addition
-                                dplyr::mutate(
-                                    .row_strata2 =
-                                        stringr::str_remove(
-                                            .data$.row_strata,
-                                            "\\s[(]N=.+[)]$"
-                                        ) %>%
-                                        forcats::as_factor()
-                                )
-                            
-                        } else {
-                            
-                            results <-
-                                results %>%
-                                
-                                #Copy original
-                                dplyr::mutate(
-                                    .row_strata2 = .data$.row_strata
-                                )
-                            
-                        }
-                        
-                        #Now compute associations
-                        association_results <-
-                            data %>%
-                            
-                            #Compute for each row strata
-                            stratiply(
-                                strata = row_strata,
-                                f = get_associations,
-                                delimiter = strata_sep,
-                                bind = TRUE
-                            ) %>%
-                            dplyr::mutate_at(
-                                ".strata",
-                                forcats::as_factor
-                            )
-                        
-                        #Join with results
-                        results <-
-                            results %>%
-                            dplyr::inner_join(
-                                y = association_results,
-                                by =
-                                    c(
-                                        ".row_strata2" = ".strata",
-                                        ".variable"
-                                    )
-                            ) %>%
-                            
-                            #Remove temporary column
-                            dplyr::select(-.data$.row_strata2)
-                    }
-                    
-                    #Extract names of association metric columns
-                    association_names <-
-                        tidyselect::vars_select(
-                            names(association_results),
-                            -tidyselect::matches("^[.](variable|strata)")
-                        )
-                    
-                    #Append the header if needed
-                    if(!is.null(header)) {
-                        
-                        header <-
-                            c(
-                                header,
-                                rep(" ", length(association_names))
-                            )
-                        
-                    }
-                }
-                
-            }
-            
-        }
-        
-        #Consolidate ordering of variables
-        if(is.null(order)) {
-            
-            #Use data order by default
-            order <- setdiff(names(data), all.vars(strata))
-            
-        } else {
-            
-            #Use provided order then finish with maintaining original column order
-            order <-
-                c(
-                    order,
-                    setdiff(
-                        names(data),
-                        c(order, all.vars(strata))
-                    )
-                )
-            
-        }
-        
-        #Extract summary variable names
-        summary_vars <-
-            tidyselect::vars_select(
-                names(results),
-                -tidyselect::matches("^[.](row_strata|variable|level|order)$")
-            )
-        
-        #Remove more columns if needed
-        if(!is.null(association_names)) {
-            
-            summary_vars <-
-                tidyselect::vars_select(
-                    summary_vars,
-                    -tidyselect::one_of(association_names)
-                )
-            
-        }
-        
-        #Reorder the variables
-        results <-
-            results %>%
-            
-            #Create a factor
-            dplyr::mutate(
-                .variable = 
-                    forcats::fct_relevel(
-                        factor(.data$.variable),
-                        order
-                    )
-            )
-        
-        #Check for groupings
-        if(!is.null(row_strata)) {
-            
-            results <-
-                results %>%
-                
-                #Group by row strata
-                dplyr::group_by(.data$.row_strata) %>%
-                
-                #Arrange within row strata
-                dplyr::arrange(
-                    .data$.variable,
-                    .by_group = TRUE
-                ) 
-            
-        } else {
-            
-            results <-
-                results %>%
-                
-                #Arrange over entire frame
-                dplyr::arrange(.data$.variable)
-            
-        }
-        
-        #Coerce back to character
-        results <-
-            results %>%
-            dplyr::mutate(
-                .variable = as.character(.data$.variable)
-            )
-        
-        #Tidy up factor levels
-        cat_vars <- FALSE
-        if(".order" %in% names(results)) {
-            
-            #Set to try
-            cat_vars <- TRUE
-            
-            results <-
-                results %>%
-                
-                #Replace explicit NA levels with string
-                dplyr::mutate(
-                    .level = 
-                        dplyr::case_when(
-                            !is.na(.data$.order) & is.na(.data$.level) & .data$.order > 0 ~ na_string,
-                            TRUE ~ .data$.level
-                        )
-                )
-            
-            #Relabel the levels if needed
-            if(!is.null(levels)) {
-                
-                #Make relational data frame
-                levels <-
-                    levels %>%
-                    purrr::map_df(
-                        ~
-                            tibble::tibble(
-                                .level = names(.x),
-                                .newLevel = unname(.x)
-                            ),
-                        .id = ".variable"
-                    )
-                
-                #Join with results
-                results <-
-                    results %>%
-                    dplyr::left_join(
-                        y = levels,
-                        by = c(".variable", ".level")
-                    ) %>%
-                    
-                    #Get new levels
-                    dplyr::mutate(
-                        .level =
-                            dplyr::case_when(
-                                !is.na(.data$.newLevel) ~ .data$.newLevel,
-                                TRUE ~ .data$.level
-                            )
-                    ) %>%
-                    
-                    #Remove new levels
-                    dplyr::select(
-                        -.data$.newLevel
-                    )
-                
-            }
-            
-        }
-        
-        #Fill in remaining blank spots in table
-        results <-
-            results %>%
-            
-            #Apply to columns with at least 1 NA
-            dplyr::mutate_if(
-                function(.x) any(is.na(.x)),
-                dplyr::funs(
-                    dplyr::case_when(
-                        is.na(.) ~ fill_blanks,
-                        TRUE ~ as.character(.)
-                    )
-                )
-            )
-        
-        #Relabel variables if needed
-        if(!is.null(labels)) {
-            
-            #Make a relational frame
-            labels <-
-                tibble::tibble(
-                    .variable = names(labels),
-                    .newVariable = unname(labels)
-                )
-            
-            #Join with results
-            results <-
-                results %>%
-                dplyr::left_join(
-                    y = labels,
-                    by = ".variable"
-                ) %>%
-                dplyr::mutate(
-                    .variable =
-                        dplyr::case_when(
-                            !is.na(.data$.newVariable) ~ .data$.newVariable,
-                            TRUE ~ as.character(.data$.variable)
-                        )
-                ) %>%
-                dplyr::select(
-                    -.data$.newVariable
-                )
-            
-        }
-        
-        #Add a group for the variable
-        results <-
-            results %>%
-            
-            #Apply within variables
-            dplyr::group_by(
-                .data$.variable,
-                add = TRUE
-            ) 
-        
-        #Remove duplicate function results
-        if(!is.null(association_names)) {
-            
-            results <-
-                results %>%
-                
-                #Apply function to association columns
-                dplyr::mutate_at(
-                    dplyr::vars(
-                        tidyselect::one_of(association_names)
-                    ),
-                    dplyr::funs(
-                        dplyr::case_when(
-                            duplicated(.) ~ fill_blanks,
-                            TRUE ~ as.character(.)
-                        )
-                    )
-                ) 
-            
-        }
-        
-        #Ungroup data
-        results <-
-            results %>%
-            dplyr::ungroup()
-        
-        row_strata_vec <- NULL
-        #Only group by row_strata if in data
-        if(!is.null(row_strata)) {
-            
-            #Keep a vector of the row_strata
-            row_strata_vec <- 
-                results %>%
-                dplyr::pull(.data$.row_strata)
-            
-            #Group by strata
-            results <-
-                results %>%
-                dplyr::group_by(.data$.row_strata)
-            
-        }
-        
-        #Get desired format
-        format <- match.arg(format)
-        
-        #Remove duplicate variable names if needed
-        if(format %in% c("pandoc", "markdown", "none")) {
-            
-            #Remove duplicate variable names
-            results <-
-                results %>%
-                dplyr::mutate(
-                    .variable =
-                        dplyr::case_when(
-                            duplicated(.data$.variable) ~ fill_blanks,
-                            TRUE ~ .data$.variable
-                        )
-                )
-            
-        }
-        
-        #Remove ordering variable and rename columns
-        results <-
-            results %>%
-            dplyr::ungroup() %>%
-            dplyr::select(
-                -tidyselect::matches("^[.]order$")
-            ) %>%
-            
-            #Provide specified column names
-            dplyr::rename_all(
-                dplyr::recode,
-                .variable = variableName,
-                .level = levelName
-            ) %>%
-            dplyr::rename_at(
-                dplyr::vars(
-                    tidyselect::matches("^[.]row_strata$")
-                ),
-                function(.z) stringr::str_c(row_strata, collapse = strata_sep)
-            )
-        
-        #Final formatting depending on type of rendering
-        if(format %in% c("pandoc", "markdown", "none")) {
-            
-            #Remove duplicated row strata
-            if(!is.null(row_strata)) {
-                
-                results <-
-                    results %>%
-                    dplyr::mutate_at(
-                        stringr::str_c(row_strata, collapse = strata_sep),
-                        dplyr::funs(
-                            dplyr::case_when(
-                                duplicated(.) ~ fill_blanks,
-                                TRUE ~ as.character(.)
-                            )
-                        )
-                    )
-            }
-            
-            #Return result
-            if(format == "none") {
-                
-                results
-                
-            } else {
-                
-                #Make a kable
-                results %>%
-                    knitr::kable(
-                        format = format,
-                        caption = caption
-                    )
-                
-            }
-            
-        } else {
-            
-            #Remove row_strata from frame if it's there
-            results <-
-                results %>%
-                dplyr::select(
-                    -tidyselect::matches(stringr::str_c("^", stringr::str_c(row_strata, collapse = strata_sep), "$"))
-                )
-            
-            #If there is a header then remove strata
-            if(!is.null(header)) {
-                
-                results <-
-                    results %>%
-                    dplyr::rename_at(
-                        summary_vars,
-                        stringr::str_remove,
-                        pattern = stringr::str_c(summary_strata_sep, ".+")
-                    )
-                
-            }
-            
-            #Make base result
-            results <-
-                results %>%
-                knitr::kable(
-                    format = format,
-                    caption = caption
-                ) %>%
-                
-                #Style the output
-                kableExtra::kable_styling(
-                    full_width = FALSE,
-                    bootstrap_options = c("striped", "responsive"),
-                    latex_options = c("striped", "responsive")
-                )
-            
-            #Group by row strata if needed
-            if(!is.null(row_strata)) {
-                
-                results <-
-                    results %>%
-                    kableExtra::group_rows(
-                        index = 
-                            kableExtra::auto_index(
-                                as.character(row_strata_vec)
-                            )
-                    )
-                
-                #Remove an entry from the header
-                header <- header[-1]
-                
-            }
-            
-            #Collapse variable column
-            results <-
-                results %>%
-                kableExtra::collapse_rows(1, valign = "top")
-            
-            #Check for header
-            if(!is.null(header)) {
-                
-                #Remove the entry for ".order"
-                if(cat_vars) 
-                    header <- header[-1]
-                
-                #Add header to table and return
-                results %>%
-                    kableExtra::add_header_above(
-                        kableExtra::auto_index(
-                            header
-                        )
-                    )
-                
-            } else {
-                
-                results
-                
-            }
-        }
-        
-    }
-
-
-
-
-
-
-
-
-
-
-
+    
+  }
