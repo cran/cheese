@@ -854,9 +854,7 @@ order_levels <-
       ) %>%
       
       #Within each combination
-      dplyr::group_by_at(
-        tidyselect::all_of(".id")
-      ) %>%
+      dplyr::group_by_at(".id") %>%
       
       #Concatenate the levels
       dplyr::summarise(
@@ -1338,7 +1336,8 @@ descriptives <-
       purrr::map_depth(
         .depth = 3,
         descriptives_component,
-        na_string = na_string
+        na_string = na_string,
+        .ragged = TRUE
       ) %>%
       
       #Bind columns
@@ -1571,6 +1570,14 @@ absorb_descriptive_variable <-
       use_summary <- other_summary
       use_filter <- "other"
       
+      #If the 'other' summary contains names, treat it categorically
+      if(any(!is.na(variable$val_lab))) {
+        
+        #Set the lower level groups
+        use_groups <- c(use_groups, "val_lab")
+        
+      }
+      
     }
     
     #Populate strings templates
@@ -1589,11 +1596,7 @@ absorb_descriptive_variable <-
         results %>%
         
         #For each level
-        dplyr::group_by_at(
-          dplyr::vars(
-            tidyselect::all_of(use_groups)
-          )
-        ) %>%
+        dplyr::group_by_at(use_groups) %>%
         
         #Absorb the strings
         dplyr::do(
@@ -1628,7 +1631,7 @@ absorb_descriptive_variable <-
       
       #Add extra row for categorical variables only
       val_lab_all <- 1
-      if("categorical" %in% eval_types)
+      if(length(use_groups) == 3)
         val_lab_all <- 0
       
       results <- 
@@ -1727,11 +1730,7 @@ f_add_n <-
           data %>%
           
           #Group by column strata
-          dplyr::group_by_at(
-            dplyr::vars(
-              tidyselect::all_of(by)
-            )
-          ) %>%
+          dplyr::group_by_at(by) %>%
           
           #Compute sample size
           dplyr::summarise(
@@ -1781,11 +1780,7 @@ remove_duplicates <-
         results %>%
         
         #Remove duplicate values
-        dplyr::group_by_at(
-          dplyr::vars(
-            tidyselect::all_of(groups)
-          )
-        )
+        dplyr::group_by_at(groups)
       
     }
     
@@ -2224,11 +2219,7 @@ univariate_table <-
           results %>%
           
           #Group by row strata
-          dplyr::group_by_at(
-            dplyr::vars(
-              tidyselect::all_of(row_strata)
-            )
-          )
+          dplyr::group_by_at(row_strata)
         
       }
       

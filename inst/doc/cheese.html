@@ -1,609 +1,982 @@
 <!DOCTYPE html>
+
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Heart disease dataset</title>
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<script type="text/javascript">
-window.onload = function() {
-  var imgs = document.getElementsByTagName('img'), i, img;
-  for (i = 0; i < imgs.length; i++) {
-    img = imgs[i];
-    // center an image if it is the only element of its parent
-    if (img.parentElement.childElementCount === 1)
-      img.parentElement.style.textAlign = 'center';
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Making cheese</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
-};
+});
 </script>
-
-<!-- Styles for R syntax highlighter -->
+<script>$(document).ready(function(){
+    if (typeof $('[data-toggle="tooltip"]').tooltip === 'function') {
+        $('[data-toggle="tooltip"]').tooltip();
+    }
+    if ($('[data-toggle="popover"]').popover === 'function') {
+        $('[data-toggle="popover"]').popover();
+    }
+});
+</script>
 <style type="text/css">
-   pre .operator,
-   pre .paren {
-     color: rgb(104, 118, 135)
-   }
-
-   pre .literal {
-     color: #990073
-   }
-
-   pre .number {
-     color: #099;
-   }
-
-   pre .comment {
-     color: #998;
-     font-style: italic
-   }
-
-   pre .keyword {
-     color: #900;
-     font-weight: bold
-   }
-
-   pre .identifier {
-     color: rgb(0, 0, 0);
-   }
-
-   pre .string {
-     color: #d14;
-   }
+.lightable-minimal {
+border-collapse: separate;
+border-spacing: 16px 1px;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-minimal td {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal th {
+margin-left: 5px;
+margin-right: 5px;
+}
+.lightable-minimal thead tr:last-child th {
+border-bottom: 2px solid #00000050;
+empty-cells: hide;
+}
+.lightable-minimal tbody tr:first-child td {
+padding-top: 0.5em;
+}
+.lightable-minimal.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-minimal.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic {
+border-top: 0.16em solid #111111;
+border-bottom: 0.16em solid #111111;
+width: 100%;
+margin-bottom: 10px;
+margin: 10px 5px;
+}
+.lightable-classic tfoot tr td {
+border: 0;
+}
+.lightable-classic tfoot tr:first-child td {
+border-top: 0.14em solid #111111;
+}
+.lightable-classic caption {
+color: #222222;
+}
+.lightable-classic td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic thead tr:last-child th {
+border-bottom: 0.10em solid #111111;
+}
+.lightable-classic.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-classic-2 {
+border-top: 3px double #111111;
+border-bottom: 3px double #111111;
+width: 100%;
+margin-bottom: 10px;
+}
+.lightable-classic-2 tfoot tr td {
+border: 0;
+}
+.lightable-classic-2 tfoot tr:first-child td {
+border-top: 3px double #111111;
+}
+.lightable-classic-2 caption {
+color: #222222;
+}
+.lightable-classic-2 td {
+padding-left: 5px;
+padding-right: 5px;
+color: #222222;
+}
+.lightable-classic-2 th {
+padding-left: 5px;
+padding-right: 5px;
+font-weight: normal;
+color: #222222;
+}
+.lightable-classic-2 tbody tr:last-child td {
+border-bottom: 3px double #111111;
+}
+.lightable-classic-2 thead tr:last-child th {
+border-bottom: 1px solid #111111;
+}
+.lightable-classic-2.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-classic-2.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #EEE;
+border-collapse: collapse;
+margin-bottom: 10px;
+}
+.lightable-material tfoot tr td {
+border: 0;
+}
+.lightable-material tfoot tr:first-child td {
+border-top: 1px solid #EEE;
+}
+.lightable-material th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+}
+.lightable-material td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+border-top: 1px solid #eeeeee;
+}
+.lightable-material.lightable-hover tbody tr:hover {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody tr:nth-child(even) {
+background-color: #f5f5f5;
+}
+.lightable-material.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #ddd;
+}
+.lightable-material-dark {
+min-width: 100%;
+white-space: nowrap;
+table-layout: fixed;
+font-family: Roboto, sans-serif;
+border: 1px solid #FFFFFF12;
+border-collapse: collapse;
+margin-bottom: 10px;
+background-color: #363640;
+}
+.lightable-material-dark tfoot tr td {
+border: 0;
+}
+.lightable-material-dark tfoot tr:first-child td {
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark th {
+height: 56px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF60;
+}
+.lightable-material-dark td {
+height: 52px;
+padding-left: 16px;
+padding-right: 16px;
+color: #FFFFFF;
+border-top: 1px solid #FFFFFF12;
+}
+.lightable-material-dark.lightable-hover tbody tr:hover {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody tr:nth-child(even) {
+background-color: #FFFFFF12;
+}
+.lightable-material-dark.lightable-striped tbody td {
+border: 0;
+}
+.lightable-material-dark.lightable-striped thead tr:last-child th {
+border-bottom: 1px solid #FFFFFF12;
+}
+.lightable-paper {
+width: 100%;
+margin-bottom: 10px;
+color: #444;
+}
+.lightable-paper tfoot tr td {
+border: 0;
+}
+.lightable-paper tfoot tr:first-child td {
+border-top: 1px solid #00000020;
+}
+.lightable-paper thead tr:last-child th {
+color: #666;
+vertical-align: bottom;
+border-bottom: 1px solid #00000020;
+line-height: 1.15em;
+padding: 10px 5px;
+}
+.lightable-paper td {
+vertical-align: middle;
+border-bottom: 1px solid #00000010;
+line-height: 1.15em;
+padding: 7px 5px;
+}
+.lightable-paper.lightable-hover tbody tr:hover {
+background-color: #F9EEC1;
+}
+.lightable-paper.lightable-striped tbody tr:nth-child(even) {
+background-color: #00000008;
+}
+.lightable-paper.lightable-striped tbody td {
+border: 0;
+}
 </style>
 
-<!-- R syntax highlighter -->
-<script type="text/javascript">
-var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
-hljs.initHighlightingOnLoad();
-</script>
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-body, td {
-   font-family: sans-serif;
-   background-color: white;
-   font-size: 13px;
+code {
+white-space: pre;
 }
-
-body {
-  max-width: 800px;
-  margin: auto;
-  padding: 1em;
-  line-height: 20px;
+.sourceCode {
+overflow: visible;
 }
-
-tt, code, pre {
-   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
 }
-
-h1 {
-   font-size:2.2em;
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-
-h2 {
-   font-size:1.8em;
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
 }
-
-h3 {
-   font-size:1.4em;
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
-h4 {
-   font-size:1.0em;
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
 }
-
-h5 {
-   font-size:0.9em;
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
 }
-
-h6 {
-   font-size:0.8em;
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
 }
-
-a:visited {
-   color: rgb(50%, 0%, 50%);
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
 }
-
-pre, img {
-  max-width: 100%;
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
 }
 pre {
-  overflow-x: auto;
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
 }
-pre code {
-   display: block; padding: 0.5em;
+pre:not([class]) {
+background-color: #f7f7f7;
 }
-
 code {
-  font-size: 92%;
-  border: 1px solid #ccc;
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
 }
-
-code[class] {
-  background-color: #F8F8F8;
+p > code, li > code {
+padding: 2px 0px;
 }
-
-table, td, th {
-  border: none;
+div.figure {
+text-align: center;
 }
-
-blockquote {
-   color:#666666;
-   margin:0;
-   padding-left: 1em;
-   border-left: 0.5em #EEE solid;
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
 }
-
-hr {
-   height: 0px;
-   border-bottom: none;
-   border-top-width: thin;
-   border-top-style: dotted;
-   border-top-color: #999999;
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
 }
-
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 100% !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
 }
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
+
 
 
 
 </head>
 
 <body>
-<p>Structuring code that is robust to updates in the data, changes in methodological specfications, etc., and can get to presentation-ready results in an automated way can mitigate errors caused by painful, tedious tasks&ndash;it can also be a huge time saver. The <code>cheese</code> package was designed with this philosophy in mind, heavily influenced by (and explicit dependencies on) <a href="https://www.tidyverse.org/"><code>tidy</code></a> concepts. Its intention is to provide general tools for working with data and results during statistical analysis, in addition to a collection of functions designated for specific statistical tasks. </p>
 
-<p>Let&#39;s take a closer look:</p>
 
-<pre><code class="r">#Load the package
-require(cheese)
-</code></pre>
 
-<pre><code>## Loading required package: cheese
-</code></pre>
 
+<h1 class="title toc-ignore">Making cheese</h1>
+
+
+
+<p>Structuring code that is robust to updates in the data, changes in
+methodological specifications, etc., and can get to presentation-ready
+results in an automated way can mitigate errors caused by painful,
+tedious tasks–it can also be a huge time saver. The <code>cheese</code>
+package was designed with this philosophy in mind, heavily influenced by
+(and explicit dependencies on) <a href="https://www.tidyverse.org/"><code>tidy</code></a> concepts. Its
+intention is to provide general tools for working with data and results
+during statistical analysis, in addition to a collection of functions
+designated for specific statistical tasks.</p>
+<p>Let’s take a closer look:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Load the package</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(cheese)</span></code></pre></div>
+<pre><code>## Loading required package: cheese</code></pre>
+<div id="heart-disease-dataset" class="section level3">
 <h3>Heart disease dataset</h3>
-
-<p>This data comes from the <a href="http://archive.ics.uci.edu/ml/datasets/Heart+Disease">UCI Machine Learning Repository</a>, containing a collection of demographic and clinical characteristics from 303 patients. It was subsequently processed and cleaned into a format suitable for analysis&ndash;details of which can be found <a href="https://github.com/zajichek/cheese/blob/master/data-raw/heart_disease.R">here</a>.</p>
-
-<pre><code class="r">#Look at the data
-heart_disease
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 9
-##      Age Sex   ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1    63 Male  Typical …   145         233 TRUE             150
-##  2    67 Male  Asymptom…   160         286 FALSE            108
-##  3    67 Male  Asymptom…   120         229 FALSE            129
-##  4    37 Male  Non-angi…   130         250 FALSE            187
-##  5    41 Fema… Atypical…   130         204 FALSE            172
-##  6    56 Male  Atypical…   120         236 FALSE            178
-##  7    62 Fema… Asymptom…   140         268 FALSE            160
-##  8    57 Fema… Asymptom…   120         354 FALSE            163
-##  9    63 Male  Asymptom…   130         254 FALSE            147
-## 10    53 Male  Asymptom…   140         203 TRUE             155
-## # … with 293 more rows, and 2 more variables: ExerciseInducedAngina &lt;fct&gt;,
-## #   HeartDisease &lt;fct&gt;
-</code></pre>
-
-<p>The functions that will be introduced are roughly in order of their development, as many build off of one another. Selection of columns is done with non-standard evaluation (NSE) or with <code>tidyselect::select_helpers</code>, where applicable.</p>
-
+<p>This data comes from the <a href="http://archive.ics.uci.edu/ml/datasets/Heart+Disease">UCI Machine
+Learning Repository</a>, containing a collection of demographic and
+clinical characteristics from 303 patients. It was subsequently
+processed and cleaned into a format suitable for analysis–details of
+which can be found <a href="https://github.com/zajichek/cheese/blob/master/data-raw/heart_disease.R">here</a>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Look at the data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>heart_disease</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 9
+##      Age Sex    ChestPain           BP Cholest…¹ Blood…² Maxim…³ Exerc…⁴ Heart…⁵
+##    &lt;dbl&gt; &lt;fct&gt;  &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt;  
+##  1    63 Male   Typical angina     145       233 TRUE        150 No      No     
+##  2    67 Male   Asymptomatic       160       286 FALSE       108 Yes     Yes    
+##  3    67 Male   Asymptomatic       120       229 FALSE       129 Yes     Yes    
+##  4    37 Male   Non-anginal pain   130       250 FALSE       187 No      No     
+##  5    41 Female Atypical angina    130       204 FALSE       172 No      No     
+##  6    56 Male   Atypical angina    120       236 FALSE       178 No      No     
+##  7    62 Female Asymptomatic       140       268 FALSE       160 No      Yes    
+##  8    57 Female Asymptomatic       120       354 FALSE       163 Yes     No     
+##  9    63 Male   Asymptomatic       130       254 FALSE       147 No      Yes    
+## 10    53 Male   Asymptomatic       140       203 TRUE        155 Yes     Yes    
+## # … with 293 more rows, and abbreviated variable names ¹​Cholesterol,
+## #   ²​BloodSugar, ³​MaximumHR, ⁴​ExerciseInducedAngina, ⁵​HeartDisease</code></pre>
+<p>The functions that will be introduced are roughly in order of their
+development, as many build off of one another. Selection of columns is
+done with non-standard evaluation (NSE) or with
+<code>tidyselect::select_helpers</code>, where applicable.</p>
+</div>
+<div id="splitting-and-binding-data" class="section level1">
 <h1>Splitting and binding data</h1>
-
-<p><code>divide()</code> is used to split up a data frame into a list of subsets. Suppose you want to split the example dataset by sex and heart disease status:</p>
-
-<pre><code class="r">div_dat &lt;-
-  heart_disease %&gt;%
-    divide(
-      Sex,
-      HeartDisease
-    )
-div_dat
-</code></pre>
-
+<p><code>divide()</code> is used to split up a data frame into a list of
+subsets. Suppose you want to split the example data set by sex and heart
+disease status:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="ot">&lt;-</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">divide</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      Sex,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      HeartDisease</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>div_dat</span></code></pre></div>
 <pre><code>## $Female
 ## $Female$No
-## # A tibble: 72 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    41 Atypical …   130         204 FALSE            172 No              
-##  2    57 Asymptoma…   120         354 FALSE            163 Yes             
-##  3    56 Atypical …   140         294 FALSE            153 No              
-##  4    48 Non-angin…   130         275 FALSE            139 No              
-##  5    58 Typical a…   150         283 TRUE             162 No              
-##  6    50 Non-angin…   120         219 FALSE            158 No              
-##  7    58 Non-angin…   120         340 FALSE            172 No              
-##  8    66 Typical a…   150         226 FALSE            114 No              
-##  9    69 Typical a…   140         239 FALSE            151 No              
-## 10    71 Atypical …   160         302 FALSE            162 No              
-## # … with 62 more rows
+## # A tibble: 72 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    41 Atypical angina    130         204 FALSE            172 No             
+##  2    57 Asymptomatic       120         354 FALSE            163 Yes            
+##  3    56 Atypical angina    140         294 FALSE            153 No             
+##  4    48 Non-anginal pain   130         275 FALSE            139 No             
+##  5    58 Typical angina     150         283 TRUE             162 No             
+##  6    50 Non-anginal pain   120         219 FALSE            158 No             
+##  7    58 Non-anginal pain   120         340 FALSE            172 No             
+##  8    66 Typical angina     150         226 FALSE            114 No             
+##  9    69 Typical angina     140         239 FALSE            151 No             
+## 10    71 Atypical angina    160         302 FALSE            162 No             
+## # … with 62 more rows, and abbreviated variable name ¹​ExerciseInducedAngina
 ## 
 ## $Female$Yes
-## # A tibble: 25 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    62 Asymptoma…   140         268 FALSE            160 No              
-##  2    65 Asymptoma…   150         225 FALSE            114 No              
-##  3    61 Asymptoma…   130         330 FALSE            169 No              
-##  4    51 Asymptoma…   130         305 FALSE            142 Yes             
-##  5    62 Asymptoma…   160         164 FALSE            145 No              
-##  6    60 Asymptoma…   150         258 FALSE            157 No              
-##  7    61 Asymptoma…   145         307 FALSE            146 Yes             
-##  8    43 Asymptoma…   132         341 TRUE             136 Yes             
-##  9    62 Non-angin…   130         263 FALSE             97 No              
-## 10    63 Asymptoma…   150         407 FALSE            154 No              
-## # … with 15 more rows
+## # A tibble: 25 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    62 Asymptomatic       140         268 FALSE            160 No             
+##  2    65 Asymptomatic       150         225 FALSE            114 No             
+##  3    61 Asymptomatic       130         330 FALSE            169 No             
+##  4    51 Asymptomatic       130         305 FALSE            142 Yes            
+##  5    62 Asymptomatic       160         164 FALSE            145 No             
+##  6    60 Asymptomatic       150         258 FALSE            157 No             
+##  7    61 Asymptomatic       145         307 FALSE            146 Yes            
+##  8    43 Asymptomatic       132         341 TRUE             136 Yes            
+##  9    62 Non-anginal pain   130         263 FALSE             97 No             
+## 10    63 Asymptomatic       150         407 FALSE            154 No             
+## # … with 15 more rows, and abbreviated variable name ¹​ExerciseInducedAngina
 ## 
 ## 
 ## $Male
 ## $Male$No
-## # A tibble: 92 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    63 Typical a…   145         233 TRUE             150 No              
-##  2    37 Non-angin…   130         250 FALSE            187 No              
-##  3    56 Atypical …   120         236 FALSE            178 No              
-##  4    57 Asymptoma…   140         192 FALSE            148 No              
-##  5    44 Atypical …   120         263 FALSE            173 No              
-##  6    52 Non-angin…   172         199 TRUE             162 No              
-##  7    57 Non-angin…   150         168 FALSE            174 No              
-##  8    54 Asymptoma…   140         239 FALSE            160 No              
-##  9    49 Atypical …   130         266 FALSE            171 No              
-## 10    64 Typical a…   110         211 FALSE            144 Yes             
-## # … with 82 more rows
+## # A tibble: 92 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    63 Typical angina     145         233 TRUE             150 No             
+##  2    37 Non-anginal pain   130         250 FALSE            187 No             
+##  3    56 Atypical angina    120         236 FALSE            178 No             
+##  4    57 Asymptomatic       140         192 FALSE            148 No             
+##  5    44 Atypical angina    120         263 FALSE            173 No             
+##  6    52 Non-anginal pain   172         199 TRUE             162 No             
+##  7    57 Non-anginal pain   150         168 FALSE            174 No             
+##  8    54 Asymptomatic       140         239 FALSE            160 No             
+##  9    49 Atypical angina    130         266 FALSE            171 No             
+## 10    64 Typical angina     110         211 FALSE            144 Yes            
+## # … with 82 more rows, and abbreviated variable name ¹​ExerciseInducedAngina
 ## 
 ## $Male$Yes
-## # A tibble: 114 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    67 Asymptoma…   160         286 FALSE            108 Yes             
-##  2    67 Asymptoma…   120         229 FALSE            129 Yes             
-##  3    63 Asymptoma…   130         254 FALSE            147 No              
-##  4    53 Asymptoma…   140         203 TRUE             155 Yes             
-##  5    56 Non-angin…   130         256 TRUE             142 Yes             
-##  6    48 Atypical …   110         229 FALSE            168 No              
-##  7    58 Atypical …   120         284 FALSE            160 No              
-##  8    58 Non-angin…   132         224 FALSE            173 No              
-##  9    60 Asymptoma…   130         206 FALSE            132 Yes             
-## 10    40 Asymptoma…   110         167 FALSE            114 Yes             
-## # … with 104 more rows
-</code></pre>
-
-<p>The default behavior is to continually split the data in a hierarchical structure based on the order of the input columns, and to remove them from the result. The <code>keep</code> argument can be used to retain the column(s) in the data frames.</p>
-
-<p><code>fasten()</code> allows you to take a list structure that contains data frames at an arbitrary depth, and roll them back up into a single data frame. This is useful when a statistical process needs to be mapped to many subsets, and you want to be able to easily collect the results without repeatedly binding data. You can call the function with the divided data from above:</p>
-
-<pre><code class="r">div_dat %&gt;%
-  fasten()
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    41 Atypical …   130         204 FALSE            172 No              
-##  2    57 Asymptoma…   120         354 FALSE            163 Yes             
-##  3    56 Atypical …   140         294 FALSE            153 No              
-##  4    48 Non-angin…   130         275 FALSE            139 No              
-##  5    58 Typical a…   150         283 TRUE             162 No              
-##  6    50 Non-angin…   120         219 FALSE            158 No              
-##  7    58 Non-angin…   120         340 FALSE            172 No              
-##  8    66 Typical a…   150         226 FALSE            114 No              
-##  9    69 Typical a…   140         239 FALSE            151 No              
-## 10    71 Atypical …   160         302 FALSE            162 No              
-## # … with 293 more rows
-</code></pre>
-
-<p>It was binded back to the original number of rows, but it lost the columns it was split by. The <code>into</code> argument can be used to handle this:</p>
-
-<pre><code class="r">div_dat %&gt;%
-  fasten(
-    into = c(&quot;Sex&quot;, &quot;HeartDisease&quot;)
-  )
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 9
-##    Sex   HeartDisease   Age ChestPain    BP Cholesterol BloodSugar
-##    &lt;chr&gt; &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;     
-##  1 Fema… No              41 Atypical…   130         204 FALSE     
-##  2 Fema… No              57 Asymptom…   120         354 FALSE     
-##  3 Fema… No              56 Atypical…   140         294 FALSE     
-##  4 Fema… No              48 Non-angi…   130         275 FALSE     
-##  5 Fema… No              58 Typical …   150         283 TRUE      
-##  6 Fema… No              50 Non-angi…   120         219 FALSE     
-##  7 Fema… No              58 Non-angi…   120         340 FALSE     
-##  8 Fema… No              66 Typical …   150         226 FALSE     
-##  9 Fema… No              69 Typical …   140         239 FALSE     
-## 10 Fema… No              71 Atypical…   160         302 FALSE     
-## # … with 293 more rows, and 2 more variables: MaximumHR &lt;dbl&gt;,
-## #   ExerciseInducedAngina &lt;fct&gt;
-</code></pre>
-
-<p>The positions of the <code>into</code> values always lineup with the level of the list hierarchy. So, for example, if you don&#39;t care about retaining the heart disease status, you can do this:</p>
-
-<pre><code class="r">div_dat %&gt;%
-  fasten(
-    into = &quot;Sex&quot;
-  )
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 8
-##    Sex     Age ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1 Fema…    41 Atypical…   130         204 FALSE            172
-##  2 Fema…    57 Asymptom…   120         354 FALSE            163
-##  3 Fema…    56 Atypical…   140         294 FALSE            153
-##  4 Fema…    48 Non-angi…   130         275 FALSE            139
-##  5 Fema…    58 Typical …   150         283 TRUE             162
-##  6 Fema…    50 Non-angi…   120         219 FALSE            158
-##  7 Fema…    58 Non-angi…   120         340 FALSE            172
-##  8 Fema…    66 Typical …   150         226 FALSE            114
-##  9 Fema…    69 Typical …   140         239 FALSE            151
-## 10 Fema…    71 Atypical…   160         302 FALSE            162
-## # … with 293 more rows, and 1 more variable: ExerciseInducedAngina &lt;fct&gt;
-</code></pre>
-
-<p>In contrast, if you want to forgo the sex indicator, empty strings will need to be used as placeholders so the names are applied at the correct levels.</p>
-
-<pre><code class="r">div_dat %&gt;%
-  fasten(
-    into = c(&quot;&quot;, &quot;HeartDisease&quot;)
-  )
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 8
-##    HeartDisease   Age ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1 No              41 Atypical…   130         204 FALSE            172
-##  2 No              57 Asymptom…   120         354 FALSE            163
-##  3 No              56 Atypical…   140         294 FALSE            153
-##  4 No              48 Non-angi…   130         275 FALSE            139
-##  5 No              58 Typical …   150         283 TRUE             162
-##  6 No              50 Non-angi…   120         219 FALSE            158
-##  7 No              58 Non-angi…   120         340 FALSE            172
-##  8 No              66 Typical …   150         226 FALSE            114
-##  9 No              69 Typical …   140         239 FALSE            151
-## 10 No              71 Atypical…   160         302 FALSE            162
-## # … with 293 more rows, and 1 more variable: ExerciseInducedAngina &lt;fct&gt;
-</code></pre>
-
-<p>Obviously, the classes of the split columns are not retained from the original data since the splitting and binding processes are independent.</p>
-
+## # A tibble: 114 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    67 Asymptomatic       160         286 FALSE            108 Yes            
+##  2    67 Asymptomatic       120         229 FALSE            129 Yes            
+##  3    63 Asymptomatic       130         254 FALSE            147 No             
+##  4    53 Asymptomatic       140         203 TRUE             155 Yes            
+##  5    56 Non-anginal pain   130         256 TRUE             142 Yes            
+##  6    48 Atypical angina    110         229 FALSE            168 No             
+##  7    58 Atypical angina    120         284 FALSE            160 No             
+##  8    58 Non-anginal pain   132         224 FALSE            173 No             
+##  9    60 Asymptomatic       130         206 FALSE            132 Yes            
+## 10    40 Asymptomatic       110         167 FALSE            114 Yes            
+## # … with 104 more rows, and abbreviated variable name ¹​ExerciseInducedAngina</code></pre>
+<p>The default behavior is to continually split the data in a
+hierarchical structure based on the order of the input columns, and to
+remove them from the result. The <code>keep</code> argument can be used
+to retain the column(s) in the data frames.</p>
+<p><code>fasten()</code> allows you to take a list structure that
+contains data frames at an arbitrary depth, and roll them back up into a
+single data frame. This is useful when a statistical process needs to be
+mapped to many subsets, and you want to be able to easily collect the
+results without repeatedly binding data. You can call the function with
+the divided data from above:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    41 Atypical angina    130         204 FALSE            172 No             
+##  2    57 Asymptomatic       120         354 FALSE            163 Yes            
+##  3    56 Atypical angina    140         294 FALSE            153 No             
+##  4    48 Non-anginal pain   130         275 FALSE            139 No             
+##  5    58 Typical angina     150         283 TRUE             162 No             
+##  6    50 Non-anginal pain   120         219 FALSE            158 No             
+##  7    58 Non-anginal pain   120         340 FALSE            172 No             
+##  8    66 Typical angina     150         226 FALSE            114 No             
+##  9    69 Typical angina     140         239 FALSE            151 No             
+## 10    71 Atypical angina    160         302 FALSE            162 No             
+## # … with 293 more rows, and abbreviated variable name ¹​ExerciseInducedAngina</code></pre>
+<p>It was binded back to the original number of rows, but it lost the
+columns it was split by. The <code>into</code> argument can be used to
+handle this:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;Sex&quot;</span>, <span class="st">&quot;HeartDisease&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 9
+##    Sex    HeartDisease   Age ChestPain        BP Chole…¹ Blood…² Maxim…³ Exerc…⁴
+##    &lt;chr&gt;  &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;         &lt;dbl&gt;   &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;  
+##  1 Female No              41 Atypical ang…   130     204 FALSE       172 No     
+##  2 Female No              57 Asymptomatic    120     354 FALSE       163 Yes    
+##  3 Female No              56 Atypical ang…   140     294 FALSE       153 No     
+##  4 Female No              48 Non-anginal …   130     275 FALSE       139 No     
+##  5 Female No              58 Typical angi…   150     283 TRUE        162 No     
+##  6 Female No              50 Non-anginal …   120     219 FALSE       158 No     
+##  7 Female No              58 Non-anginal …   120     340 FALSE       172 No     
+##  8 Female No              66 Typical angi…   150     226 FALSE       114 No     
+##  9 Female No              69 Typical angi…   140     239 FALSE       151 No     
+## 10 Female No              71 Atypical ang…   160     302 FALSE       162 No     
+## # … with 293 more rows, and abbreviated variable names ¹​Cholesterol,
+## #   ²​BloodSugar, ³​MaximumHR, ⁴​ExerciseInducedAngina</code></pre>
+<p>The positions of the <code>into</code> values always lineup with the
+level of the list hierarchy. So, for example, if you don’t care about
+retaining the heart disease status, you can do this:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="st">&quot;Sex&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 8
+##    Sex      Age ChestPain           BP Cholesterol BloodSugar MaximumHR Exerci…¹
+##    &lt;chr&gt;  &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;   
+##  1 Female    41 Atypical angina    130         204 FALSE            172 No      
+##  2 Female    57 Asymptomatic       120         354 FALSE            163 Yes     
+##  3 Female    56 Atypical angina    140         294 FALSE            153 No      
+##  4 Female    48 Non-anginal pain   130         275 FALSE            139 No      
+##  5 Female    58 Typical angina     150         283 TRUE             162 No      
+##  6 Female    50 Non-anginal pain   120         219 FALSE            158 No      
+##  7 Female    58 Non-anginal pain   120         340 FALSE            172 No      
+##  8 Female    66 Typical angina     150         226 FALSE            114 No      
+##  9 Female    69 Typical angina     140         239 FALSE            151 No      
+## 10 Female    71 Atypical angina    160         302 FALSE            162 No      
+## # … with 293 more rows, and abbreviated variable name ¹​ExerciseInducedAngina</code></pre>
+<p>In contrast, if you want to forgo the sex indicator, empty strings
+will need to be used as placeholders so the names are applied at the
+correct levels.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;&quot;</span>, <span class="st">&quot;HeartDisease&quot;</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 8
+##    HeartDisease   Age ChestPain           BP Cholesterol Blood…¹ Maxim…² Exerc…³
+##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;  
+##  1 No              41 Atypical angina    130         204 FALSE       172 No     
+##  2 No              57 Asymptomatic       120         354 FALSE       163 Yes    
+##  3 No              56 Atypical angina    140         294 FALSE       153 No     
+##  4 No              48 Non-anginal pain   130         275 FALSE       139 No     
+##  5 No              58 Typical angina     150         283 TRUE        162 No     
+##  6 No              50 Non-anginal pain   120         219 FALSE       158 No     
+##  7 No              58 Non-anginal pain   120         340 FALSE       172 No     
+##  8 No              66 Typical angina     150         226 FALSE       114 No     
+##  9 No              69 Typical angina     140         239 FALSE       151 No     
+## 10 No              71 Atypical angina    160         302 FALSE       162 No     
+## # … with 293 more rows, and abbreviated variable names ¹​BloodSugar, ²​MaximumHR,
+## #   ³​ExerciseInducedAngina</code></pre>
+<p>Obviously, the classes of the split columns are not retained from the
+original data since the splitting and binding processes are
+independent.</p>
+<div id="adjusting-the-depth" class="section level2">
 <h2>Adjusting the depth</h2>
-
-<p>As shown above, the default behavior for these functions is to split or bind &ldquo;as much as possible&rdquo;. However, it can be useful to have control over the shape of the split. This is where the <code>depth</code> argument comes in. Suppose you want the same data frames at the leaves of the list, but only one level deep:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  divide(
-    Sex,
-    HeartDisease,
-    depth = 1
-  )
-</code></pre>
-
+<p>As shown above, the default behavior for these functions is to split
+or bind “as much as possible”. However, it can be useful to have control
+over the shape of the split. This is where the <code>depth</code>
+argument comes in. Suppose you want the same data frames at the leaves
+of the list, but only one level deep:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">divide</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    Sex,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    HeartDisease,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">depth =</span> <span class="dv">1</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $`Female|No`
-## # A tibble: 72 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    41 Atypical …   130         204 FALSE            172 No              
-##  2    57 Asymptoma…   120         354 FALSE            163 Yes             
-##  3    56 Atypical …   140         294 FALSE            153 No              
-##  4    48 Non-angin…   130         275 FALSE            139 No              
-##  5    58 Typical a…   150         283 TRUE             162 No              
-##  6    50 Non-angin…   120         219 FALSE            158 No              
-##  7    58 Non-angin…   120         340 FALSE            172 No              
-##  8    66 Typical a…   150         226 FALSE            114 No              
-##  9    69 Typical a…   140         239 FALSE            151 No              
-## 10    71 Atypical …   160         302 FALSE            162 No              
-## # … with 62 more rows
+## # A tibble: 72 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    41 Atypical angina    130         204 FALSE            172 No             
+##  2    57 Asymptomatic       120         354 FALSE            163 Yes            
+##  3    56 Atypical angina    140         294 FALSE            153 No             
+##  4    48 Non-anginal pain   130         275 FALSE            139 No             
+##  5    58 Typical angina     150         283 TRUE             162 No             
+##  6    50 Non-anginal pain   120         219 FALSE            158 No             
+##  7    58 Non-anginal pain   120         340 FALSE            172 No             
+##  8    66 Typical angina     150         226 FALSE            114 No             
+##  9    69 Typical angina     140         239 FALSE            151 No             
+## 10    71 Atypical angina    160         302 FALSE            162 No             
+## # … with 62 more rows, and abbreviated variable name ¹​ExerciseInducedAngina
 ## 
 ## $`Male|No`
-## # A tibble: 92 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    63 Typical a…   145         233 TRUE             150 No              
-##  2    37 Non-angin…   130         250 FALSE            187 No              
-##  3    56 Atypical …   120         236 FALSE            178 No              
-##  4    57 Asymptoma…   140         192 FALSE            148 No              
-##  5    44 Atypical …   120         263 FALSE            173 No              
-##  6    52 Non-angin…   172         199 TRUE             162 No              
-##  7    57 Non-angin…   150         168 FALSE            174 No              
-##  8    54 Asymptoma…   140         239 FALSE            160 No              
-##  9    49 Atypical …   130         266 FALSE            171 No              
-## 10    64 Typical a…   110         211 FALSE            144 Yes             
-## # … with 82 more rows
+## # A tibble: 92 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    63 Typical angina     145         233 TRUE             150 No             
+##  2    37 Non-anginal pain   130         250 FALSE            187 No             
+##  3    56 Atypical angina    120         236 FALSE            178 No             
+##  4    57 Asymptomatic       140         192 FALSE            148 No             
+##  5    44 Atypical angina    120         263 FALSE            173 No             
+##  6    52 Non-anginal pain   172         199 TRUE             162 No             
+##  7    57 Non-anginal pain   150         168 FALSE            174 No             
+##  8    54 Asymptomatic       140         239 FALSE            160 No             
+##  9    49 Atypical angina    130         266 FALSE            171 No             
+## 10    64 Typical angina     110         211 FALSE            144 Yes            
+## # … with 82 more rows, and abbreviated variable name ¹​ExerciseInducedAngina
 ## 
 ## $`Female|Yes`
-## # A tibble: 25 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    62 Asymptoma…   140         268 FALSE            160 No              
-##  2    65 Asymptoma…   150         225 FALSE            114 No              
-##  3    61 Asymptoma…   130         330 FALSE            169 No              
-##  4    51 Asymptoma…   130         305 FALSE            142 Yes             
-##  5    62 Asymptoma…   160         164 FALSE            145 No              
-##  6    60 Asymptoma…   150         258 FALSE            157 No              
-##  7    61 Asymptoma…   145         307 FALSE            146 Yes             
-##  8    43 Asymptoma…   132         341 TRUE             136 Yes             
-##  9    62 Non-angin…   130         263 FALSE             97 No              
-## 10    63 Asymptoma…   150         407 FALSE            154 No              
-## # … with 15 more rows
+## # A tibble: 25 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    62 Asymptomatic       140         268 FALSE            160 No             
+##  2    65 Asymptomatic       150         225 FALSE            114 No             
+##  3    61 Asymptomatic       130         330 FALSE            169 No             
+##  4    51 Asymptomatic       130         305 FALSE            142 Yes            
+##  5    62 Asymptomatic       160         164 FALSE            145 No             
+##  6    60 Asymptomatic       150         258 FALSE            157 No             
+##  7    61 Asymptomatic       145         307 FALSE            146 Yes            
+##  8    43 Asymptomatic       132         341 TRUE             136 Yes            
+##  9    62 Non-anginal pain   130         263 FALSE             97 No             
+## 10    63 Asymptomatic       150         407 FALSE            154 No             
+## # … with 15 more rows, and abbreviated variable name ¹​ExerciseInducedAngina
 ## 
 ## $`Male|Yes`
-## # A tibble: 114 x 7
-##      Age ChestPain     BP Cholesterol BloodSugar MaximumHR ExerciseInduced…
-##    &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;           
-##  1    67 Asymptoma…   160         286 FALSE            108 Yes             
-##  2    67 Asymptoma…   120         229 FALSE            129 Yes             
-##  3    63 Asymptoma…   130         254 FALSE            147 No              
-##  4    53 Asymptoma…   140         203 TRUE             155 Yes             
-##  5    56 Non-angin…   130         256 TRUE             142 Yes             
-##  6    48 Atypical …   110         229 FALSE            168 No              
-##  7    58 Atypical …   120         284 FALSE            160 No              
-##  8    58 Non-angin…   132         224 FALSE            173 No              
-##  9    60 Asymptoma…   130         206 FALSE            132 Yes             
-## 10    40 Asymptoma…   110         167 FALSE            114 Yes             
-## # … with 104 more rows
-</code></pre>
-
-<p>You now have list with four elements containing the subsets&ndash;the names of which are the concatenated levels of the split columns (see the <code>sep</code> argument). </p>
-
-<p>This argument also works when binding data. Going back to the original divided data frame, you may only want to bind the internal lists.</p>
-
-<pre><code class="r">div_dat %&gt;%
-  fasten(
-    into = &quot;HeartDisease&quot;,
-    depth = 1
-  )
-</code></pre>
-
+## # A tibble: 114 × 7
+##      Age ChestPain           BP Cholesterol BloodSugar MaximumHR ExerciseInduc…¹
+##    &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt; &lt;fct&gt;          
+##  1    67 Asymptomatic       160         286 FALSE            108 Yes            
+##  2    67 Asymptomatic       120         229 FALSE            129 Yes            
+##  3    63 Asymptomatic       130         254 FALSE            147 No             
+##  4    53 Asymptomatic       140         203 TRUE             155 Yes            
+##  5    56 Non-anginal pain   130         256 TRUE             142 Yes            
+##  6    48 Atypical angina    110         229 FALSE            168 No             
+##  7    58 Atypical angina    120         284 FALSE            160 No             
+##  8    58 Non-anginal pain   132         224 FALSE            173 No             
+##  9    60 Asymptomatic       130         206 FALSE            132 Yes            
+## 10    40 Asymptomatic       110         167 FALSE            114 Yes            
+## # … with 104 more rows, and abbreviated variable name ¹​ExerciseInducedAngina</code></pre>
+<p>You now have list with four elements containing the subsets–the names
+of which are the concatenated levels of the split columns (see the
+<code>sep</code> argument).</p>
+<p>This argument also works when binding data. Going back to the
+original divided data frame, you may only want to bind the internal
+lists.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="st">&quot;HeartDisease&quot;</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">depth =</span> <span class="dv">1</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $Female
-## # A tibble: 97 x 8
-##    HeartDisease   Age ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1 No              41 Atypical…   130         204 FALSE            172
-##  2 No              57 Asymptom…   120         354 FALSE            163
-##  3 No              56 Atypical…   140         294 FALSE            153
-##  4 No              48 Non-angi…   130         275 FALSE            139
-##  5 No              58 Typical …   150         283 TRUE             162
-##  6 No              50 Non-angi…   120         219 FALSE            158
-##  7 No              58 Non-angi…   120         340 FALSE            172
-##  8 No              66 Typical …   150         226 FALSE            114
-##  9 No              69 Typical …   140         239 FALSE            151
-## 10 No              71 Atypical…   160         302 FALSE            162
-## # … with 87 more rows, and 1 more variable: ExerciseInducedAngina &lt;fct&gt;
+## # A tibble: 97 × 8
+##    HeartDisease   Age ChestPain           BP Cholesterol Blood…¹ Maxim…² Exerc…³
+##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;  
+##  1 No              41 Atypical angina    130         204 FALSE       172 No     
+##  2 No              57 Asymptomatic       120         354 FALSE       163 Yes    
+##  3 No              56 Atypical angina    140         294 FALSE       153 No     
+##  4 No              48 Non-anginal pain   130         275 FALSE       139 No     
+##  5 No              58 Typical angina     150         283 TRUE        162 No     
+##  6 No              50 Non-anginal pain   120         219 FALSE       158 No     
+##  7 No              58 Non-anginal pain   120         340 FALSE       172 No     
+##  8 No              66 Typical angina     150         226 FALSE       114 No     
+##  9 No              69 Typical angina     140         239 FALSE       151 No     
+## 10 No              71 Atypical angina    160         302 FALSE       162 No     
+## # … with 87 more rows, and abbreviated variable names ¹​BloodSugar, ²​MaximumHR,
+## #   ³​ExerciseInducedAngina
 ## 
 ## $Male
-## # A tibble: 206 x 8
-##    HeartDisease   Age ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1 No              63 Typical …   145         233 TRUE             150
-##  2 No              37 Non-angi…   130         250 FALSE            187
-##  3 No              56 Atypical…   120         236 FALSE            178
-##  4 No              57 Asymptom…   140         192 FALSE            148
-##  5 No              44 Atypical…   120         263 FALSE            173
-##  6 No              52 Non-angi…   172         199 TRUE             162
-##  7 No              57 Non-angi…   150         168 FALSE            174
-##  8 No              54 Asymptom…   140         239 FALSE            160
-##  9 No              49 Atypical…   130         266 FALSE            171
-## 10 No              64 Typical …   110         211 FALSE            144
-## # … with 196 more rows, and 1 more variable: ExerciseInducedAngina &lt;fct&gt;
-</code></pre>
-
-<p>Note that the positions of the <code>into</code> values are directly related to how shallow/deep you want the result to be.</p>
-
-<p>The depth can also be controlled relative to the leaves by using negative integers. This can be useful if it is unclear how deep the list will be (or is). In the example above, suppose you didn&#39;t know how deep the list was, but you knew the heart disease status was the most internal split, and thus wanted to bind it.</p>
-
-<pre><code class="r">div_dat %&gt;%
-  fasten(
-    into = &quot;HeartDisease&quot;,
-    depth = -1
-  )
-</code></pre>
-
+## # A tibble: 206 × 8
+##    HeartDisease   Age ChestPain           BP Cholesterol Blood…¹ Maxim…² Exerc…³
+##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;  
+##  1 No              63 Typical angina     145         233 TRUE        150 No     
+##  2 No              37 Non-anginal pain   130         250 FALSE       187 No     
+##  3 No              56 Atypical angina    120         236 FALSE       178 No     
+##  4 No              57 Asymptomatic       140         192 FALSE       148 No     
+##  5 No              44 Atypical angina    120         263 FALSE       173 No     
+##  6 No              52 Non-anginal pain   172         199 TRUE        162 No     
+##  7 No              57 Non-anginal pain   150         168 FALSE       174 No     
+##  8 No              54 Asymptomatic       140         239 FALSE       160 No     
+##  9 No              49 Atypical angina    130         266 FALSE       171 No     
+## 10 No              64 Typical angina     110         211 FALSE       144 Yes    
+## # … with 196 more rows, and abbreviated variable names ¹​BloodSugar, ²​MaximumHR,
+## #   ³​ExerciseInducedAngina</code></pre>
+<p>Note that the positions of the <code>into</code> values are directly
+related to how shallow/deep you want the result to be.</p>
+<p>The depth can also be controlled relative to the leaves by using
+negative integers. This can be useful if it is unclear how deep the list
+will be (or is). In the example above, suppose you didn’t know how deep
+the list was, but you knew the heart disease status was the most
+internal split, and thus wanted to bind it.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>div_dat <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="st">&quot;HeartDisease&quot;</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">depth =</span> <span class="sc">-</span><span class="dv">1</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $Female
-## # A tibble: 97 x 8
-##    HeartDisease   Age ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1 No              41 Atypical…   130         204 FALSE            172
-##  2 No              57 Asymptom…   120         354 FALSE            163
-##  3 No              56 Atypical…   140         294 FALSE            153
-##  4 No              48 Non-angi…   130         275 FALSE            139
-##  5 No              58 Typical …   150         283 TRUE             162
-##  6 No              50 Non-angi…   120         219 FALSE            158
-##  7 No              58 Non-angi…   120         340 FALSE            172
-##  8 No              66 Typical …   150         226 FALSE            114
-##  9 No              69 Typical …   140         239 FALSE            151
-## 10 No              71 Atypical…   160         302 FALSE            162
-## # … with 87 more rows, and 1 more variable: ExerciseInducedAngina &lt;fct&gt;
+## # A tibble: 97 × 8
+##    HeartDisease   Age ChestPain           BP Cholesterol Blood…¹ Maxim…² Exerc…³
+##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;  
+##  1 No              41 Atypical angina    130         204 FALSE       172 No     
+##  2 No              57 Asymptomatic       120         354 FALSE       163 Yes    
+##  3 No              56 Atypical angina    140         294 FALSE       153 No     
+##  4 No              48 Non-anginal pain   130         275 FALSE       139 No     
+##  5 No              58 Typical angina     150         283 TRUE        162 No     
+##  6 No              50 Non-anginal pain   120         219 FALSE       158 No     
+##  7 No              58 Non-anginal pain   120         340 FALSE       172 No     
+##  8 No              66 Typical angina     150         226 FALSE       114 No     
+##  9 No              69 Typical angina     140         239 FALSE       151 No     
+## 10 No              71 Atypical angina    160         302 FALSE       162 No     
+## # … with 87 more rows, and abbreviated variable names ¹​BloodSugar, ²​MaximumHR,
+## #   ³​ExerciseInducedAngina
 ## 
 ## $Male
-## # A tibble: 206 x 8
-##    HeartDisease   Age ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1 No              63 Typical …   145         233 TRUE             150
-##  2 No              37 Non-angi…   130         250 FALSE            187
-##  3 No              56 Atypical…   120         236 FALSE            178
-##  4 No              57 Asymptom…   140         192 FALSE            148
-##  5 No              44 Atypical…   120         263 FALSE            173
-##  6 No              52 Non-angi…   172         199 TRUE             162
-##  7 No              57 Non-angi…   150         168 FALSE            174
-##  8 No              54 Asymptom…   140         239 FALSE            160
-##  9 No              49 Atypical…   130         266 FALSE            171
-## 10 No              64 Typical …   110         211 FALSE            144
-## # … with 196 more rows, and 1 more variable: ExerciseInducedAngina &lt;fct&gt;
-</code></pre>
-
-<p>The new depth is one less than the input. In this case, the same result was achieved because of the symmetry. </p>
-
+## # A tibble: 206 × 8
+##    HeartDisease   Age ChestPain           BP Cholesterol Blood…¹ Maxim…² Exerc…³
+##    &lt;chr&gt;        &lt;dbl&gt; &lt;fct&gt;            &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;  
+##  1 No              63 Typical angina     145         233 TRUE        150 No     
+##  2 No              37 Non-anginal pain   130         250 FALSE       187 No     
+##  3 No              56 Atypical angina    120         236 FALSE       178 No     
+##  4 No              57 Asymptomatic       140         192 FALSE       148 No     
+##  5 No              44 Atypical angina    120         263 FALSE       173 No     
+##  6 No              52 Non-anginal pain   172         199 TRUE        162 No     
+##  7 No              57 Non-anginal pain   150         168 FALSE       174 No     
+##  8 No              54 Asymptomatic       140         239 FALSE       160 No     
+##  9 No              49 Atypical angina    130         266 FALSE       171 No     
+## 10 No              64 Typical angina     110         211 FALSE       144 Yes    
+## # … with 196 more rows, and abbreviated variable names ¹​BloodSugar, ²​MaximumHR,
+## #   ³​ExerciseInducedAngina</code></pre>
+<p>The new depth is one less than the input. In this case, the same
+result was achieved because of the symmetry.</p>
+</div>
+</div>
+<div id="applying-functions" class="section level1">
 <h1>Applying functions</h1>
-
-<p>The next set of functions are rooted in functional programming (i.e. <a href="https://purrr.tidyverse.org/"><code>purrr</code></a>). In each instance, given a pre-defined function, you can easily control the scope of the data in which it is evaluated on. This is an incredibly useful and efficient philosphy for generating reusable code that is non-repetitive.</p>
-
+<p>The next set of functions are rooted in functional programming
+(i.e. <a href="https://purrr.tidyverse.org/"><code>purrr</code></a>). In
+each instance, given a pre-defined function, you can easily control the
+scope of the data in which it is evaluated on. This is an incredibly
+useful and efficient philosophy for generating reusable code that is
+non-repetitive.</p>
+<div id="pairwise-combinations-of-column-sets" class="section level2">
 <h2>Pairwise combinations of column sets</h2>
-
-<p>Often times a statistical analysis is concerned with mulitple outcomes/targets, though each one potentially uses the same set of explanatory variables. You could of course hard code the specific analysis steps for each outcome (e.g. formulas, etc.), but then the code becomes repetitive. You could also make separate datasets for each outcome with the associated predictors and then apply the same analysis process to each dataset, but then you waste resources by storing multiple copies of the same data in memory. <code>dish()</code> allows you to distribute a function to various pairwise sets of columns from the same dataset in a single call. The motivation described above is merely that&ndash;this is a generalizable function that can be applied to any context.</p>
-
-<p>As a simple first example, lets compute the Pearson correlation of blood pressure and cholesterol with all numeric columns:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  dish(
-    f = cor,
-    left = c(BP, Cholesterol),
-    right = is.numeric
-  )
-</code></pre>
-
+<p>Often times a statistical analysis is concerned with multiple
+outcomes/targets, though each one potentially uses the same set of
+explanatory variables. You could of course hard code the specific
+analysis steps for each outcome (e.g. formulas, etc.), but then the code
+becomes repetitive. You could also make separate data sets for each
+outcome with the associated predictors and then apply the same analysis
+process to each data set, but then you waste resources by storing
+multiple copies of the same data in memory. <code>dish()</code> allows
+you to distribute a function to various pairwise sets of columns from
+the same data set in a single call. The motivation described above is
+merely that–this is a general function that can be applied to any
+context.</p>
+<p>As a simple first example, lets compute the Pearson correlation of
+blood pressure and cholesterol with all numeric columns:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dish</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> cor,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">left =</span> <span class="fu">c</span>(BP, Cholesterol),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">right =</span> <span class="fu">where</span>(is.numeric)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $BP
 ## $BP$Age
 ## [1] 0.2849459
@@ -629,19 +1002,21 @@ div_dat
 ## [1] 1
 ## 
 ## $Cholesterol$MaximumHR
-## [1] -0.003431832
-</code></pre>
-
-<p>The <code>left</code> argument controls which columns are entered in the first argument of <code>f</code>, and the <code>right</code> argument controls which columns are entered into the second. In the example, you&#39;ll notice that the <code>left</code> columns were also included in the set of <code>right</code> columns, because they are, in fact, <code>numeric()</code>. If you didn&#39;t want this, you can omit the <code>right</code> argument, which will then include everything not in <code>left</code> as the second argument of <code>f</code>:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  dplyr::select_if(is.numeric) %&gt;% #Need to do this so only numeric columns are evaluated
-  dish(
-    f = cor,
-    left = c(BP, Cholesterol)
-  )
-</code></pre>
-
+## [1] -0.003431832</code></pre>
+<p>The <code>left</code> argument controls which columns are entered in
+the first argument of <code>f</code>, and the <code>right</code>
+argument controls which columns are entered into the second. In the
+example, you’ll notice that the <code>left</code> columns were also
+included in the set of <code>right</code> columns, because they are, in
+fact, <code>numeric()</code>. If you didn’t want this, you can omit the
+<code>right</code> argument, which will then include everything not in
+<code>left</code> as the second argument of <code>f</code>:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span> <span class="co">#Need to do this so only numeric columns are evaluated</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dish</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> cor,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">left =</span> <span class="fu">c</span>(BP, Cholesterol)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $BP
 ## $BP$Age
 ## [1] 0.2849459
@@ -655,19 +1030,19 @@ div_dat
 ## [1] 0.2089503
 ## 
 ## $Cholesterol$MaximumHR
-## [1] -0.003431832
-</code></pre>
-
-<p>Now lets suppose you want to regress both blood pressure and cholesterol on all other variables in the dataset. The <code>each_</code> arguments allow you to control whether the column sets are entered into the function individually as vectors, or together in a single data frame. The former is the default, so you&#39;ll need to use this argument here:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  dish(
-    f = function(y, x) lm(y ~ ., data = x),
-    left = c(BP, Cholesterol),
-    each_right = FALSE
-  )
-</code></pre>
-
+## [1] -0.003431832</code></pre>
+<p>Now lets suppose you want to regress both blood pressure and
+cholesterol on all other variables in the data set. The
+<code>each_</code> arguments allow you to control whether the column
+sets are entered into the function individually as vectors, or together
+in a single data frame. The former is the default, so you’ll need to use
+this argument here:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dish</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> <span class="cf">function</span>(y, x) <span class="fu">lm</span>(y <span class="sc">~</span> ., <span class="at">data =</span> x),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">left =</span> <span class="fu">c</span>(BP, Cholesterol),</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">each_right =</span> <span class="cn">FALSE</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $BP
 ## 
 ## Call:
@@ -701,33 +1076,31 @@ div_dat
 ##            BloodSugarTRUE                  MaximumHR  
 ##                   -0.7327                     0.3491  
 ##  ExerciseInducedAnginaYes            HeartDiseaseYes  
-##                    7.8039                    12.5303
-</code></pre>
-
+##                    7.8039                    12.5303</code></pre>
+</div>
+<div id="subsets-of-data" class="section level2">
 <h2>Subsets of data</h2>
-
-<p><code>stratiply()</code> streamlines the familiar <code>split()</code> then <code>purrr::map()</code> approach by making it simple to select the stratification columns, and apply a function to each subset. Let&#39;s run a multiple logistic regression model using heart disease as the outcome, stratified by sex:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  stratiply(
-    f = glm,
-    by = Sex,
-    formula = HeartDisease ~ . -ChestPain,
-    family = &quot;binomial&quot;
-  )
-</code></pre>
-
+<p><code>stratiply()</code> streamlines the familiar
+<code>split()</code> then <code>purrr::map()</code> approach by making
+it simple to select the stratification columns, and apply a function to
+each subset. Let’s run a multiple logistic regression model using heart
+disease as the outcome, stratified by sex:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stratiply</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> glm,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> Sex,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> HeartDisease <span class="sc">~</span> . <span class="sc">-</span>ChestPain,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $Female
 ## 
 ## Call:  .f(formula = ..1, family = &quot;binomial&quot;, data = .x[[i]])
 ## 
 ## Coefficients:
-##              (Intercept)                       Age  
-##                 -6.95485                   0.03362  
-##                       BP               Cholesterol  
-##                  0.04366                   0.00354  
-##           BloodSugarTRUE                 MaximumHR  
-##                  0.47028                  -0.02465  
+##              (Intercept)                       Age                        BP  
+##                 -6.95485                   0.03362                   0.04366  
+##              Cholesterol            BloodSugarTRUE                 MaximumHR  
+##                  0.00354                   0.47028                  -0.02465  
 ## ExerciseInducedAnginaYes  
 ##                  2.12039  
 ## 
@@ -740,41 +1113,35 @@ div_dat
 ## Call:  .f(formula = ..1, family = &quot;binomial&quot;, data = .x[[i]])
 ## 
 ## Coefficients:
-##              (Intercept)                       Age  
-##                 1.877142                  0.024853  
-##                       BP               Cholesterol  
-##                 0.007710                  0.008718  
-##           BloodSugarTRUE                 MaximumHR  
-##                -0.390310                 -0.042231  
+##              (Intercept)                       Age                        BP  
+##                 1.877142                  0.024853                  0.007710  
+##              Cholesterol            BloodSugarTRUE                 MaximumHR  
+##                 0.008718                 -0.390310                 -0.042231  
 ## ExerciseInducedAnginaYes  
 ##                 1.106387  
 ## 
 ## Degrees of Freedom: 205 Total (i.e. Null);  199 Residual
 ## Null Deviance:       283.2 
-## Residual Deviance: 211.2     AIC: 225.2
-</code></pre>
-
-<p>Adding multiple stratification columns will produce a deeper list:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  stratiply(
-    f = glm,
-    by = c(Sex, ExerciseInducedAngina),
-    formula = HeartDisease ~ . -ChestPain,
-    family = &quot;binomial&quot;
-  )
-</code></pre>
-
+## Residual Deviance: 211.2     AIC: 225.2</code></pre>
+<p>Adding multiple stratification columns will produce a deeper
+list:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stratiply</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> glm,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(Sex, ExerciseInducedAngina),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">formula =</span> HeartDisease <span class="sc">~</span> . <span class="sc">-</span>ChestPain,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $Female
 ## $Female$No
 ## 
 ## Call:  .f(formula = ..1, family = &quot;binomial&quot;, data = .x[[i]])
 ## 
 ## Coefficients:
-##    (Intercept)             Age              BP     Cholesterol  
-##       -9.58123         0.01027         0.07213         0.00406  
-## BloodSugarTRUE       MaximumHR  
-##        0.65807        -0.02540  
+##    (Intercept)             Age              BP     Cholesterol  BloodSugarTRUE  
+##       -9.58123         0.01027         0.07213         0.00406         0.65807  
+##      MaximumHR  
+##       -0.02540  
 ## 
 ## Degrees of Freedom: 74 Total (i.e. Null);  69 Residual
 ## Null Deviance:       62.53 
@@ -785,10 +1152,10 @@ div_dat
 ## Call:  .f(formula = ..1, family = &quot;binomial&quot;, data = .x[[i]])
 ## 
 ## Coefficients:
-##    (Intercept)             Age              BP     Cholesterol  
-##       3.850121        0.049450        0.012214        0.001458  
-## BloodSugarTRUE       MaximumHR  
-##       0.945153       -0.056538  
+##    (Intercept)             Age              BP     Cholesterol  BloodSugarTRUE  
+##       3.850121        0.049450        0.012214        0.001458        0.945153  
+##      MaximumHR  
+##      -0.056538  
 ## 
 ## Degrees of Freedom: 21 Total (i.e. Null);  16 Residual
 ## Null Deviance:       28.84 
@@ -801,10 +1168,10 @@ div_dat
 ## Call:  .f(formula = ..1, family = &quot;binomial&quot;, data = .x[[i]])
 ## 
 ## Coefficients:
-##    (Intercept)             Age              BP     Cholesterol  
-##       2.728309        0.053058       -0.003653        0.005387  
-## BloodSugarTRUE       MaximumHR  
-##      -1.106214       -0.042036  
+##    (Intercept)             Age              BP     Cholesterol  BloodSugarTRUE  
+##       2.728309        0.053058       -0.003653        0.005387       -1.106214  
+##      MaximumHR  
+##      -0.042036  
 ## 
 ## Degrees of Freedom: 128 Total (i.e. Null);  123 Residual
 ## Null Deviance:       174 
@@ -815,27 +1182,28 @@ div_dat
 ## Call:  .f(formula = ..1, family = &quot;binomial&quot;, data = .x[[i]])
 ## 
 ## Coefficients:
-##    (Intercept)             Age              BP     Cholesterol  
-##        0.70070        -0.01348         0.03561         0.01342  
-## BloodSugarTRUE       MaximumHR  
-##        1.09404        -0.04531  
+##    (Intercept)             Age              BP     Cholesterol  BloodSugarTRUE  
+##        0.70070        -0.01348         0.03561         0.01342         1.09404  
+##      MaximumHR  
+##       -0.04531  
 ## 
 ## Degrees of Freedom: 76 Total (i.e. Null);  71 Residual
 ## Null Deviance:       75.94 
-## Residual Deviance: 60.53     AIC: 72.53
-</code></pre>
-
+## Residual Deviance: 60.53     AIC: 72.53</code></pre>
+</div>
+<div id="distributing-to-specific-classes" class="section level2">
 <h2>Distributing to specific classes</h2>
-
-<p><code>typly()</code> allows you to apply a function to columns of a data frame whose type inherits at least one (or none) of the specified candidates. It is similar to <code>purrr::map_if()</code>, but uses <code>methods::is()</code> for determining types (see <code>some_type()</code>), and only returns the results for the selected columns:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  typly(
-    f = mean,
-    types = c(&quot;numeric&quot;, &quot;logical&quot;)
-  )
-</code></pre>
-
+<p><code>typly()</code> allows you to apply a function to columns of a
+data frame whose type inherits at least one (or none) of the specified
+candidates. It is similar to <code>purrr::map_if()</code>, but uses
+<code>methods::is()</code> for determining types (see
+<code>some_type()</code>), and only returns the results for the selected
+columns:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">typly</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> mean,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">types =</span> <span class="fu">c</span>(<span class="st">&quot;numeric&quot;</span>, <span class="st">&quot;logical&quot;</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $Age
 ## [1] 54.43894
 ## 
@@ -849,20 +1217,16 @@ div_dat
 ## [1] 0.1485149
 ## 
 ## $MaximumHR
-## [1] 149.6073
-</code></pre>
-
-<p>You can use the <code>negated</code> argument to apply the function to columns that are not any of the listed types:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  typly(
-    f = table,
-    types = c(&quot;numeric&quot;, &quot;logical&quot;),
-    negated = TRUE,
-    useNA = &quot;always&quot;
-  )
-</code></pre>
-
+## [1] 149.6073</code></pre>
+<p>You can use the <code>negated</code> argument to apply the function
+to columns that are not any of the listed types:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">typly</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> table,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">types =</span> <span class="fu">c</span>(<span class="st">&quot;numeric&quot;</span>, <span class="st">&quot;logical&quot;</span>),</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">negated =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">useNA =</span> <span class="st">&quot;always&quot;</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <pre><code>## $Sex
 ## 
 ## Female   Male   &lt;NA&gt; 
@@ -883,56 +1247,55 @@ div_dat
 ## $HeartDisease
 ## 
 ##   No  Yes &lt;NA&gt; 
-##  164  139    0
-</code></pre>
-
+##  164  139    0</code></pre>
+</div>
+</div>
+<div id="populating-key-value-pairs-into-custom-string-templates" class="section level1">
 <h1>Populating key-value pairs into custom string templates</h1>
-
-<p><code>absorb()</code> allows you to create collections of strings that use keys as placeholders, which are then populated by the values. This is useful for setting up results of your analysis to be presented in a specific format that is independent of the dataset at hand. Here&#39;s a simple example:</p>
-
-<pre><code class="r">absorb(
-  key = c(&quot;mean&quot;, &quot;sd&quot;, &quot;var&quot;),
-  value = c(&quot;10&quot;, &quot;2&quot;, &quot;4&quot;),
-  text = 
-    c(
-      &quot;MEAN: mean, SD: sd&quot;,
-      &quot;VAR: var = sd^2&quot;,
-      MEAN = &quot;mean&quot;
-    )
-)
-</code></pre>
-
+<p><code>absorb()</code> allows you to create collections of strings
+that use keys as placeholders, which are then populated by the values.
+This is useful for setting up results of your analysis to be presented
+in a specific format that is independent of the data set at hand. Here’s
+a simple example:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">absorb</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">key =</span> <span class="fu">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;sd&quot;</span>, <span class="st">&quot;var&quot;</span>),</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="st">&quot;10&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;4&quot;</span>),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">text =</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;MEAN: mean, SD: sd&quot;</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;VAR: var = sd^2&quot;</span>,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">MEAN =</span> <span class="st">&quot;mean&quot;</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##                                                  MEAN 
-## &quot;MEAN: 10, SD: 2&quot;    &quot;VAR: 4 = 2^2&quot;              &quot;10&quot;
-</code></pre>
-
-<p>The input <code>text</code> is scanned to look for the keys (interpreted as regular expressions) and are replaced with the corresponding values. </p>
-
-<p>Let&#39;s look at a more useful example. Suppose we have a collection summary statistics for patient age by angina and heart disease status:</p>
-
-<pre><code class="r">age_stats &lt;-
-  heart_disease %&gt;%
-  dplyr::group_by(
-    ExerciseInducedAngina,
-    HeartDisease
-  ) %&gt;%
-  dplyr::summarise(
-    mean = round(mean(Age), 2),
-    sd = round(sd(Age), 2),
-    median = median(Age),
-    iqr = IQR(Age)
-  ) %&gt;%
-  dplyr::ungroup() %&gt;%
-  tidyr::gather(
-    key = &quot;key&quot;,
-    value = &quot;value&quot;,
-    -ExerciseInducedAngina,
-    -HeartDisease
-  )
-age_stats
-</code></pre>
-
-<pre><code>## # A tibble: 16 x 4
+## &quot;MEAN: 10, SD: 2&quot;    &quot;VAR: 4 = 2^2&quot;              &quot;10&quot;</code></pre>
+<p>The input <code>text</code> is scanned to look for the keys
+(interpreted as regular expressions) and are replaced with the
+corresponding values.</p>
+<p>Let’s look at a more useful example. Suppose we have a collection
+summary statistics for patient age by angina and heart disease
+status:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>age_stats <span class="ot">&lt;-</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    ExerciseInducedAngina,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    HeartDisease</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Age), <span class="dv">2</span>),</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd =</span> <span class="fu">round</span>(<span class="fu">sd</span>(Age), <span class="dv">2</span>),</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">median =</span> <span class="fu">median</span>(Age),</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">iqr =</span> <span class="fu">IQR</span>(Age),</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">gather</span>(</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">key =</span> <span class="st">&quot;key&quot;</span>,</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> <span class="st">&quot;value&quot;</span>,</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span>ExerciseInducedAngina,</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>    <span class="sc">-</span>HeartDisease</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>age_stats</span></code></pre></div>
+<pre><code>## # A tibble: 16 × 4
 ##    ExerciseInducedAngina HeartDisease key    value
 ##    &lt;fct&gt;                 &lt;fct&gt;        &lt;chr&gt;  &lt;dbl&gt;
 ##  1 No                    No           mean   52.4 
@@ -950,242 +1313,221 @@ age_stats
 ## 13 No                    No           iqr    15   
 ## 14 No                    Yes          iqr    10   
 ## 15 Yes                   No           iqr    12.5 
-## 16 Yes                   Yes          iqr     8.25
-</code></pre>
-
-<p>Next, you can specify the string format you want to nicely summarise the information in each group:</p>
-
-<pre><code class="r">age_stats %&gt;%
-  dplyr::group_by(
-    ExerciseInducedAngina,
-    HeartDisease
-  ) %&gt;%
-  dplyr::summarise(
-    Summary = 
-      absorb(
-        key = key,
-        value = value,
-        text = 
-          c(
-            &quot;mean (sd) | median (iqr)&quot;
-          )
-      )
-  ) %&gt;%
-  dplyr::ungroup()
-</code></pre>
-
-<pre><code>## # A tibble: 4 x 3
+## 16 Yes                   Yes          iqr     8.25</code></pre>
+<p>Next, you can specify the string format you want to nicely summarize
+the information in each group:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>age_stats <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    ExerciseInducedAngina,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    HeartDisease</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Summary =</span> </span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">absorb</span>(</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">key =</span> key,</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">value =</span> value,</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">text =</span> </span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>          <span class="fu">c</span>(</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;mean (sd) | median (iqr)&quot;</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a>  ) </span></code></pre></div>
+<pre><code>## # A tibble: 4 × 3
 ##   ExerciseInducedAngina HeartDisease Summary                 
 ##   &lt;fct&gt;                 &lt;fct&gt;        &lt;chr&gt;                   
 ## 1 No                    No           52.42 (9.68) | 52 (15)  
 ## 2 No                    Yes          57.1 (7.56) | 58 (10)   
 ## 3 Yes                   No           53.61 (8.54) | 53 (12.5)
-## 4 Yes                   Yes          56.24 (8.27) | 57 (8.25)
-</code></pre>
-
-<p>Of course, this is much more useful when the summary data is already in the format of <code>age_stats</code>.</p>
-
+## 4 Yes                   Yes          56.24 (8.27) | 57 (8.25)</code></pre>
+<p>Of course, this is much more useful when the summary data is already
+in the format of <code>age_stats</code>.</p>
+<div id="concatenating-repetitive-keys" class="section level2">
 <h2>Concatenating repetitive keys</h2>
-
-<p>In the case where the key pattern found in the string template is repeated, its values are collapsed into a concatenated string:</p>
-
-<pre><code class="r">absorb(
-  key = age_stats$key,
-  value = age_stats$value,
-  text = c(&quot;(mean) / (sd)&quot;, &quot;median&quot;)
-)
-</code></pre>
-
+<p>In the case where the key pattern found in the string template is
+repeated, its values are collapsed into a concatenated string:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">absorb</span>(</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">key =</span> age_stats<span class="sc">$</span>key,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> age_stats<span class="sc">$</span>value,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">text =</span> <span class="fu">c</span>(<span class="st">&quot;(mean) / (sd)&quot;</span>, <span class="st">&quot;median&quot;</span>)</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## [1] &quot;(52.42_57.1_53.61_56.24) / (9.68_7.56_8.54_8.27)&quot;
-## [2] &quot;52_58_53_57&quot;
-</code></pre>
-
-<p>The <code>sep</code> argument can be used to customize how values are separated.</p>
-
+## [2] &quot;52_58_53_57&quot;</code></pre>
+<p>The <code>sep</code> argument can be used to customize how values are
+separated.</p>
+</div>
+<div id="evaluating-strings-as-expressions" class="section level2">
 <h2>Evaluating strings as expressions</h2>
-
-<p>It may be useful in some cases to evaluate the resulting string as an expression. You can setup the prior example so that the result contains valid expressions:</p>
-
-<pre><code class="r">absorb(
-  key = age_stats$key,
-  value = age_stats$value,
-  text = c(&quot;(mean) / (sd)&quot;, &quot;median&quot;),
-  sep = &quot;+&quot;,
-  evaluate = TRUE,
-  trace = TRUE
-)
-</code></pre>
-
+<p>It may be useful in some cases to evaluate the resulting string as an
+expression. You can setup the prior example so that the result contains
+valid expressions:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">absorb</span>(</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">key =</span> age_stats<span class="sc">$</span>key,</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> age_stats<span class="sc">$</span>value,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">text =</span> <span class="fu">c</span>(<span class="st">&quot;(mean) / (sd)&quot;</span>, <span class="st">&quot;median&quot;</span>),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sep =</span> <span class="st">&quot;+&quot;</span>,</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">evaluate =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace =</span> <span class="cn">TRUE</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## (mean) / (sd) median 
 ## (mean) / (sd) median 
 ## (52.42+57.1+53.61+56.24) / (sd) median 
-## (52.42+57.1+53.61+56.24) / (sd) 52+58+53+57
-</code></pre>
-
+## (52.42+57.1+53.61+56.24) / (sd) 52+58+53+57</code></pre>
 <pre><code>## [[1]]
 ## [1] 6.442584
 ## 
 ## [[2]]
-## [1] 220
-</code></pre>
-
-<p>These statistics are not entirely useful here, but you get the point.</p>
-
+## [1] 220</code></pre>
+<p>These statistics are not entirely useful here, but you get the
+point.</p>
+</div>
+</div>
+<div id="traversing-lists-to-identify-objects" class="section level1">
 <h1>Traversing lists to identify objects</h1>
-
-<p><code>depths()</code> and <code>depths_string()</code> are used for traversing a list structure to find the elements that satisfy a predicate. The former produces a vector of the unique depths that contain at least one element where <code>predicate</code> is true, and the latter creates a string representation of the traversal with the actual positions.</p>
-
-<pre><code class="r">#Make a divided data frame
-div_dat1 &lt;-
-  heart_disease %&gt;%
-  divide(
-    Sex,
-    HeartDisease
-  )
-
-#Find the depths of the data frames
-div_dat1 %&gt;%
-  depths(
-    predicate = is.data.frame
-  )
-</code></pre>
-
-<pre><code>## [1] 2
-</code></pre>
-
-<pre><code class="r">div_dat1 %&gt;%
-  depths_string(
-    predicate = is.data.frame
-  )
-</code></pre>
-
-<pre><code>## [1] &quot;{1{-1,-2},2{-1,-2}}&quot;
-</code></pre>
-
-<p>In the string result, the brackets represent the level of the list, and the integers represent the index at that level, which are negative if <code>predicate</code> is true for that element.</p>
-
-<p>By default, the algorithm continues when <code>rlang::is_bare_list()</code> so that the traversal can end with list-like objects. However, the <code>bare</code> argument can be used to traverse deeper into the list:</p>
-
-<pre><code class="r">div_dat1 %&gt;%
-  depths_string(
-    predicate = is.data.frame,
-    bare = FALSE
-  )
-</code></pre>
-
-<pre><code>## [1] &quot;{1{-1{1,2,3,4,5,6,7},-2{1,2,3,4,5,6,7}},2{-1{1,2,3,4,5,6,7},-2{1,2,3,4,5,6,7}}}&quot;
-</code></pre>
-
-<p>Now it also evaluated the columns of each data frame in the list, though it still found the correct positions where the predicate held.</p>
-
+<p><code>depths()</code> and <code>depths_string()</code> are used for
+traversing a list structure to find the elements that satisfy a
+predicate. The former produces a vector of the unique depths that
+contain at least one element where <code>predicate</code> is true, and
+the latter creates a string representation of the traversal with the
+actual positions.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Make a divided data frame</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>div_dat1 <span class="ot">&lt;-</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">divide</span>(</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    Sex,</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    HeartDisease</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Find the depths of the data frames</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>div_dat1 <span class="sc">%&gt;%</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">depths</span>(</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicate =</span> is.data.frame</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## [1] 2</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>div_dat1 <span class="sc">%&gt;%</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">depths_string</span>(</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicate =</span> is.data.frame</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## [1] &quot;{1{-1,-2},2{-1,-2}}&quot;</code></pre>
+<p>In the string result, the brackets represent the level of the list,
+and the integers represent the index at that level, which are negative
+if <code>predicate</code> is true for that element.</p>
+<p>By default, the algorithm continues when
+<code>rlang::is_bare_list()</code> so that the traversal can end with
+list-like objects. However, the <code>bare</code> argument can be used
+to traverse deeper into the list:</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>div_dat1 <span class="sc">%&gt;%</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">depths_string</span>(</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">predicate =</span> is.data.frame,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">bare =</span> <span class="cn">FALSE</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## [1] &quot;{1{-1{1,2,3,4,5,6,7},-2{1,2,3,4,5,6,7}},2{-1{1,2,3,4,5,6,7},-2{1,2,3,4,5,6,7}}}&quot;</code></pre>
+<p>Now it also evaluated the columns of each data frame in the list,
+though it still found the correct positions where the predicate
+held.</p>
+</div>
+<div id="distorting-relationships-between-columns" class="section level1">
 <h1>Distorting relationships between columns</h1>
-
-<p><code>muddle()</code> can be used to randomly shuffle columns in a data frame. This is a convenient way to remove confounding when exploring the effects of a variable on an outcome.</p>
-
-<pre><code class="r">set.seed(123)
-heart_disease %&gt;%
-  muddle()
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 9
-##      Age Sex   ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1    43 Fema… Non-angi…   130         214 FALSE            120
-##  2    44 Male  Asymptom…   130         204 FALSE            143
-##  3    68 Fema… Asymptom…   128         242 FALSE            125
-##  4    35 Fema… Asymptom…   120         269 FALSE            163
-##  5    45 Fema… Atypical…   138         240 FALSE            169
-##  6    54 Male  Asymptom…   128         209 FALSE            182
-##  7    61 Male  Asymptom…   100         258 FALSE            152
-##  8    57 Fema… Asymptom…   152         229 FALSE            142
-##  9    67 Male  Non-angi…   110         283 FALSE            138
-## 10    51 Fema… Atypical…   125         204 TRUE             161
-## # … with 293 more rows, and 2 more variables: ExerciseInducedAngina &lt;fct&gt;,
-## #   HeartDisease &lt;fct&gt;
-</code></pre>
-
-<p>All columns are permuted by default. Use the <code>at</code> argument to only shuffle certain ones:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  muddle(
-    at = Age
-  )
-</code></pre>
-
-<pre><code>## # A tibble: 303 x 9
-##      Age Sex   ChestPain    BP Cholesterol BloodSugar MaximumHR
-##    &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-##  1    47 Male  Typical …   145         233 TRUE             150
-##  2    49 Male  Asymptom…   160         286 FALSE            108
-##  3    59 Male  Asymptom…   120         229 FALSE            129
-##  4    35 Male  Non-angi…   130         250 FALSE            187
-##  5    44 Fema… Atypical…   130         204 FALSE            172
-##  6    29 Male  Atypical…   120         236 FALSE            178
-##  7    45 Fema… Asymptom…   140         268 FALSE            160
-##  8    59 Fema… Asymptom…   120         354 FALSE            163
-##  9    46 Male  Asymptom…   130         254 FALSE            147
-## 10    54 Male  Asymptom…   140         203 TRUE             155
-## # … with 293 more rows, and 2 more variables: ExerciseInducedAngina &lt;fct&gt;,
-## #   HeartDisease &lt;fct&gt;
-</code></pre>
-
-<p>Additional arguments can be passed to <code>sample()</code> as well. For example, you might want five random values from each column:</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  muddle(
-    size = 5
-  )
-</code></pre>
-
-<pre><code>## # A tibble: 5 x 9
-##     Age Sex   ChestPain    BP Cholesterol BloodSugar MaximumHR
-##   &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt;     &lt;dbl&gt;       &lt;dbl&gt; &lt;lgl&gt;          &lt;dbl&gt;
-## 1    54 Fema… Asymptom…   136         275 TRUE             163
-## 2    62 Male  Asymptom…   125         271 FALSE            195
-## 3    52 Male  Non-angi…   150         286 FALSE            105
-## 4    64 Male  Asymptom…   106         273 FALSE            163
-## 5    54 Male  Atypical…   120         199 FALSE            182
-## # … with 2 more variables: ExerciseInducedAngina &lt;fct&gt;, HeartDisease &lt;fct&gt;
-</code></pre>
-
+<p><code>muddle()</code> can be used to randomly shuffle columns in a
+data frame. This is a convenient way to remove confounding when
+exploring the effects of a variable on an outcome.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">muddle</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 9
+##      Age Sex    ChestPain           BP Cholest…¹ Blood…² Maxim…³ Exerc…⁴ Heart…⁵
+##    &lt;dbl&gt; &lt;fct&gt;  &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt;  
+##  1    43 Female Non-anginal pain   130       214 FALSE       120 Yes     No     
+##  2    44 Male   Asymptomatic       130       204 FALSE       143 Yes     Yes    
+##  3    68 Female Asymptomatic       128       242 FALSE       125 Yes     No     
+##  4    35 Female Asymptomatic       120       269 FALSE       163 Yes     Yes    
+##  5    45 Female Atypical angina    138       240 FALSE       169 No      No     
+##  6    54 Male   Asymptomatic       128       209 FALSE       182 Yes     No     
+##  7    61 Male   Asymptomatic       100       258 FALSE       152 Yes     Yes    
+##  8    57 Female Asymptomatic       152       229 FALSE       142 No      No     
+##  9    67 Male   Non-anginal pain   110       283 FALSE       138 No      Yes    
+## 10    51 Female Atypical angina    125       204 TRUE        161 No      No     
+## # … with 293 more rows, and abbreviated variable names ¹​Cholesterol,
+## #   ²​BloodSugar, ³​MaximumHR, ⁴​ExerciseInducedAngina, ⁵​HeartDisease</code></pre>
+<p>All columns are permuted by default. Use the <code>at</code> argument
+to only shuffle certain ones:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">muddle</span>(</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> Age</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 303 × 9
+##      Age Sex    ChestPain           BP Cholest…¹ Blood…² Maxim…³ Exerc…⁴ Heart…⁵
+##    &lt;dbl&gt; &lt;fct&gt;  &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt;  
+##  1    47 Male   Typical angina     145       233 TRUE        150 No      No     
+##  2    49 Male   Asymptomatic       160       286 FALSE       108 Yes     Yes    
+##  3    59 Male   Asymptomatic       120       229 FALSE       129 Yes     Yes    
+##  4    35 Male   Non-anginal pain   130       250 FALSE       187 No      No     
+##  5    44 Female Atypical angina    130       204 FALSE       172 No      No     
+##  6    29 Male   Atypical angina    120       236 FALSE       178 No      No     
+##  7    45 Female Asymptomatic       140       268 FALSE       160 No      Yes    
+##  8    59 Female Asymptomatic       120       354 FALSE       163 Yes     No     
+##  9    46 Male   Asymptomatic       130       254 FALSE       147 No      Yes    
+## 10    54 Male   Asymptomatic       140       203 TRUE        155 Yes     Yes    
+## # … with 293 more rows, and abbreviated variable names ¹​Cholesterol,
+## #   ²​BloodSugar, ³​MaximumHR, ⁴​ExerciseInducedAngina, ⁵​HeartDisease</code></pre>
+<p>Additional arguments can be passed to <code>sample()</code> as well.
+For example, you might want five random values from each column:</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">muddle</span>(</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">5</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 9
+##     Age Sex    ChestPain           BP Choleste…¹ Blood…² Maxim…³ Exerc…⁴ Heart…⁵
+##   &lt;dbl&gt; &lt;fct&gt;  &lt;fct&gt;            &lt;dbl&gt;      &lt;dbl&gt; &lt;lgl&gt;     &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt;  
+## 1    54 Female Asymptomatic       136        275 TRUE        163 No      No     
+## 2    62 Male   Asymptomatic       125        271 FALSE       195 No      No     
+## 3    52 Male   Non-anginal pain   150        286 FALSE       105 No      No     
+## 4    64 Male   Asymptomatic       106        273 FALSE       163 Yes     No     
+## 5    54 Male   Atypical angina    120        199 FALSE       182 Yes     Yes    
+## # … with abbreviated variable names ¹​Cholesterol, ²​BloodSugar, ³​MaximumHR,
+## #   ⁴​ExerciseInducedAngina, ⁵​HeartDisease</code></pre>
+</div>
+<div id="spanning-keys-and-values-across-the-columns" class="section level1">
 <h1>Spanning keys and values across the columns</h1>
-
-<p><code>stretch()</code> is for spanning keys and values across the columns. It is similar to <code>tidyr::spread()</code>, but allows for any number of keys and values to be selected. It&#39;s functionality is more so targeted at setting up your results to be presented in a table, rather than for general data manipulation. Thus, the resulting column names and orderings are setup to make it a seamless transition. </p>
-
-<p>To illustrate, lets first collect the parameter estimates and standard errors from multiple regression models using blood pressure and cholesterol as outcomes, stratified by sex:</p>
-
-<pre><code class="r">mod_results &lt;-
-  heart_disease %&gt;%
-
-  #For each sex
-  stratiply(
-    by = Sex,
-    f =
-      ~.x %&gt;%
-
-      #Collect coefficients and standard errors for model estimates on multiple outcomes
-      dish(
-        f = function(y, x) {
-          model &lt;- lm(y ~ ., data = x)
-          tibble::tibble(
-            Parameter = names(model$coefficients),
-            Estimate = model$coefficients,
-            SE = sqrt(diag(vcov(model)))
-          )
-        },
-        left = c(BP, Cholesterol),
-        each_right = FALSE
-      ) 
-  ) %&gt;%
-
-  #Gather results into a single data frame
-  fasten(
-    into = c(&quot;Sex&quot;, &quot;Outcome&quot;)
-  )
-mod_results
-</code></pre>
-
-<pre><code>## # A tibble: 36 x 5
+<p><code>stretch()</code> is for spanning keys and values across the
+columns. It is similar to <code>tidyr::spread()</code>, but allows for
+any number of keys and values to be selected. It’s functionality is more
+so targeted at setting up your results to be presented in a table,
+rather than for general data manipulation. Thus, the resulting column
+names and orderings are setup to make it a seamless transition.</p>
+<p>To illustrate, lets first collect the parameter estimates and
+standard errors from multiple regression models using blood pressure and
+cholesterol as outcomes, stratified by sex:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>mod_results <span class="ot">&lt;-</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#For each sex</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stratiply</span>(</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> Sex,</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span></span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>      <span class="sc">~</span>.x <span class="sc">%&gt;%</span></span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>      <span class="co">#Collect coefficients and standard errors for model estimates on multiple outcomes</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dish</span>(</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">f =</span> <span class="cf">function</span>(y, x) {</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>          model <span class="ot">&lt;-</span> <span class="fu">lm</span>(y <span class="sc">~</span> ., <span class="at">data =</span> x)</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>          tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">Parameter =</span> <span class="fu">names</span>(model<span class="sc">$</span>coefficients),</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>            <span class="at">Estimate =</span> model<span class="sc">$</span>coefficients,</span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">SE =</span> <span class="fu">sqrt</span>(<span class="fu">diag</span>(<span class="fu">vcov</span>(model)))</span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>        <span class="at">left =</span> <span class="fu">c</span>(BP, Cholesterol),</span>
+<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">each_right =</span> <span class="cn">FALSE</span></span>
+<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a>      ) </span>
+<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb58-24"><a href="#cb58-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb58-25"><a href="#cb58-25" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Gather results into a single data frame</span></span>
+<span id="cb58-26"><a href="#cb58-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fasten</span>(</span>
+<span id="cb58-27"><a href="#cb58-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;Sex&quot;</span>, <span class="st">&quot;Outcome&quot;</span>)</span>
+<span id="cb58-28"><a href="#cb58-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb58-29"><a href="#cb58-29" aria-hidden="true" tabindex="-1"></a>mod_results</span></code></pre></div>
+<pre><code>## # A tibble: 36 × 5
 ##    Sex    Outcome     Parameter                 Estimate      SE
 ##    &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;                        &lt;dbl&gt;   &lt;dbl&gt;
 ##  1 Female BP          (Intercept)                 93.7   24.7   
@@ -1198,421 +1540,856 @@ mod_results
 ##  8 Female BP          ExerciseInducedAnginaYes     8.00   4.89  
 ##  9 Female BP          HeartDiseaseYes             12.1    5.21  
 ## 10 Female Cholesterol (Intercept)                -12.1   91.6   
-## # … with 26 more rows
-</code></pre>
-
-<p>Now lets span the estimates and standard errors across the columns for both outcomes:</p>
-
-<pre><code class="r">straught1 &lt;-
-  mod_results %&gt;%
-  stretch(
-    key = Outcome,
-    value = c(Estimate, SE)
-  )
-straught1
-</code></pre>
-
-<pre><code>## # A tibble: 18 x 6
-##    Sex    Parameter     BP_Estimate   BP_SE Cholesterol_Est… Cholesterol_SE
-##    &lt;chr&gt;  &lt;chr&gt;               &lt;dbl&gt;   &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;
-##  1 Female (Intercept)       93.7    24.7             -12.1           91.6  
-##  2 Female Age                0.533   0.210             2.30           0.779
-##  3 Female BloodSugarTR…      6.92    5.53             24.6           20.6  
-##  4 Female ChestPainAsy…    -14.2     9.64             34.0           35.8  
-##  5 Female ChestPainAty…    -16.3     9.73             22.7           36.1  
-##  6 Female ChestPainNon…    -15.3     9.15             34.1           34.0  
-##  7 Female ExerciseIndu…      8.00    4.89              8.14          18.2  
-##  8 Female HeartDisease…     12.1     5.21              5.88          19.3  
-##  9 Female MaximumHR          0.123   0.0993            0.720          0.369
-## 10 Male   (Intercept)      105.     14.7             151.            38.7  
-## 11 Male   Age                0.480   0.142             0.765          0.374
-## 12 Male   BloodSugarTR…      4.96    3.12             -6.85           8.23 
-## 13 Male   ChestPainAsy…    -10.0     4.25              3.38          11.2  
-## 14 Male   ChestPainAty…     -8.61    4.68              9.55          12.3  
-## 15 Male   ChestPainNon…     -6.99    4.31             -0.802         11.4  
-## 16 Male   ExerciseIndu…     -1.08    2.78              6.88           7.33 
-## 17 Male   HeartDisease…      3.07    2.80             13.4            7.39 
-## 18 Male   MaximumHR          0.0392  0.0601            0.239          0.158
-</code></pre>
-
-<p>The <code>sep</code> argument controls how the new column names are concatenated. </p>
-
-<p>Now suppose you wanted to also span sex across the columns. It can just be added to the keys:</p>
-
-<pre><code class="r">straught2 &lt;-
-  mod_results %&gt;%
-  stretch(
-    key = c(Sex, Outcome),
-    value = c(Estimate, SE)
-  )
-straught2
-</code></pre>
-
-<pre><code>## # A tibble: 9 x 9
-##   Parameter Female_BP_Estim… Female_BP_SE Female_Choleste… Female_Choleste…
-##   &lt;chr&gt;                &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-## 1 (Interce…           93.7        24.7             -12.1             91.6  
-## 2 Age                  0.533       0.210             2.30             0.779
-## 3 BloodSug…            6.92        5.53             24.6             20.6  
-## 4 ChestPai…          -14.2         9.64             34.0             35.8  
-## 5 ChestPai…          -16.3         9.73             22.7             36.1  
-## 6 ChestPai…          -15.3         9.15             34.1             34.0  
-## 7 Exercise…            8.00        4.89              8.14            18.2  
-## 8 HeartDis…           12.1         5.21              5.88            19.3  
-## 9 MaximumHR            0.123       0.0993            0.720            0.369
-## # … with 4 more variables: Male_BP_Estimate &lt;dbl&gt;, Male_BP_SE &lt;dbl&gt;,
-## #   Male_Cholesterol_Estimate &lt;dbl&gt;, Male_Cholesterol_SE &lt;dbl&gt;
-</code></pre>
-
-<p>Notice how the resulting columns are positioned. They are sequentially sorted starting with the outer-most key in a hierarchical manner. Since there are multiple <code>value</code> columns in this example, their names are also appended to the result in the order in which they were requested.</p>
-
+## # … with 26 more rows</code></pre>
+<p>Now lets span the estimates and standard errors across the columns
+for both outcomes:</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>straught1 <span class="ot">&lt;-</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>  mod_results <span class="sc">%&gt;%</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stretch</span>(</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">key =</span> Outcome,</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> <span class="fu">c</span>(Estimate, SE)</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>straught1</span></code></pre></div>
+<pre><code>## # A tibble: 18 × 6
+##    Sex    Parameter                 BP_Estimate   BP_SE Cholesterol_Es…¹ Chole…²
+##    &lt;chr&gt;  &lt;chr&gt;                           &lt;dbl&gt;   &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Female (Intercept)                   93.7    24.7             -12.1    91.6  
+##  2 Female Age                            0.533   0.210             2.30    0.779
+##  3 Female BloodSugarTRUE                 6.92    5.53             24.6    20.6  
+##  4 Female ChestPainAsymptomatic        -14.2     9.64             34.0    35.8  
+##  5 Female ChestPainAtypical angina     -16.3     9.73             22.7    36.1  
+##  6 Female ChestPainNon-anginal pain    -15.3     9.15             34.1    34.0  
+##  7 Female ExerciseInducedAnginaYes       8.00    4.89              8.14   18.2  
+##  8 Female HeartDiseaseYes               12.1     5.21              5.88   19.3  
+##  9 Female MaximumHR                      0.123   0.0993            0.720   0.369
+## 10 Male   (Intercept)                  105.     14.7             151.     38.7  
+## 11 Male   Age                            0.480   0.142             0.765   0.374
+## 12 Male   BloodSugarTRUE                 4.96    3.12             -6.85    8.23 
+## 13 Male   ChestPainAsymptomatic        -10.0     4.25              3.38   11.2  
+## 14 Male   ChestPainAtypical angina      -8.61    4.68              9.55   12.3  
+## 15 Male   ChestPainNon-anginal pain     -6.99    4.31             -0.802  11.4  
+## 16 Male   ExerciseInducedAnginaYes      -1.08    2.78              6.88    7.33 
+## 17 Male   HeartDiseaseYes                3.07    2.80             13.4     7.39 
+## 18 Male   MaximumHR                      0.0392  0.0601            0.239   0.158
+## # … with abbreviated variable names ¹​Cholesterol_Estimate, ²​Cholesterol_SE</code></pre>
+<p>The <code>sep</code> argument controls how the new column names are
+concatenated.</p>
+<p>Now suppose you wanted to also span sex across the columns. It can
+just be added to the keys:</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>straught2 <span class="ot">&lt;-</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  mod_results <span class="sc">%&gt;%</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stretch</span>(</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">key =</span> <span class="fu">c</span>(Sex, Outcome),</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">value =</span> <span class="fu">c</span>(Estimate, SE)</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>straught2</span></code></pre></div>
+<pre><code>## # A tibble: 9 × 9
+##   Parameter     Femal…¹ Femal…² Femal…³ Femal…⁴ Male_B…⁵ Male_…⁶ Male_…⁷ Male_…⁸
+##   &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)    93.7   24.7    -12.1    91.6   105.     14.7    151.     38.7  
+## 2 Age             0.533  0.210    2.30    0.779   0.480   0.142    0.765   0.374
+## 3 BloodSugarTR…   6.92   5.53    24.6    20.6     4.96    3.12    -6.85    8.23 
+## 4 ChestPainAsy… -14.2    9.64    34.0    35.8   -10.0     4.25     3.38   11.2  
+## 5 ChestPainAty… -16.3    9.73    22.7    36.1    -8.61    4.68     9.55   12.3  
+## 6 ChestPainNon… -15.3    9.15    34.1    34.0    -6.99    4.31    -0.802  11.4  
+## 7 ExerciseIndu…   8.00   4.89     8.14   18.2    -1.08    2.78     6.88    7.33 
+## 8 HeartDisease…  12.1    5.21     5.88   19.3     3.07    2.80    13.4     7.39 
+## 9 MaximumHR       0.123  0.0993   0.720   0.369   0.0392  0.0601   0.239   0.158
+## # … with abbreviated variable names ¹​Female_BP_Estimate, ²​Female_BP_SE,
+## #   ³​Female_Cholesterol_Estimate, ⁴​Female_Cholesterol_SE, ⁵​Male_BP_Estimate,
+## #   ⁶​Male_BP_SE, ⁷​Male_Cholesterol_Estimate, ⁸​Male_Cholesterol_SE</code></pre>
+<p>Notice how the resulting columns are positioned. They are
+sequentially sorted starting with the outer-most key in a hierarchical
+manner. Since there are multiple <code>value</code> columns in this
+example, their names are also appended to the result in the order in
+which they were requested.</p>
+<div id="stacking-headers-in-a-table" class="section level2">
 <h2>Stacking headers in a table</h2>
-
-<p><code>grable()</code> stands for &ldquo;graded table&rdquo;. It is used to stack headers into a <code>knitr::kable()</code> in an automated fashion by iteratively parsing the column names by the specified delimiter. The result of <code>stretch()</code> was purposely made to flow directly into this function.</p>
-
-<pre><code class="r">straught1 %&gt;%
-  grable(
-    at = -c(Sex, Parameter)
-  )
-</code></pre>
-
+<p><code>grable()</code> stands for “graded table”. It is used to stack
+headers into a <code>knitr::kable()</code> in an automated fashion by
+iteratively parsing the column names by the specified delimiter. The
+result of <code>stretch()</code> was purposely made to flow directly
+into this function.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>straught1 <span class="sc">%&gt;%</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grable</span>(</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> <span class="sc">-</span><span class="fu">c</span>(Sex, Parameter)</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;">
- <thead>
+<thead>
 <tr>
-<th style="border-bottom:hidden" colspan="2"></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">BP</div></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Cholesterol</div></th>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="2">
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+BP
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Cholesterol
+</div>
+</th>
 </tr>
-  <tr>
-   <th style="text-align:left;"> Sex </th>
-   <th style="text-align:left;"> Parameter </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-  </tr>
- </thead>
+<tr>
+<th style="text-align:left;">
+Sex
+</th>
+<th style="text-align:left;">
+Parameter
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+</tr>
+</thead>
 <tbody>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> (Intercept) </td>
-   <td style="text-align:right;"> 93.7187493 </td>
-   <td style="text-align:right;"> 24.6536900 </td>
-   <td style="text-align:right;"> -12.1297785 </td>
-   <td style="text-align:right;"> 91.6044593 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> Age </td>
-   <td style="text-align:right;"> 0.5330329 </td>
-   <td style="text-align:right;"> 0.2096016 </td>
-   <td style="text-align:right;"> 2.2975419 </td>
-   <td style="text-align:right;"> 0.7788061 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> BloodSugarTRUE </td>
-   <td style="text-align:right;"> 6.9178015 </td>
-   <td style="text-align:right;"> 5.5329199 </td>
-   <td style="text-align:right;"> 24.5796821 </td>
-   <td style="text-align:right;"> 20.5583885 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> ChestPainAsymptomatic </td>
-   <td style="text-align:right;"> -14.1810178 </td>
-   <td style="text-align:right;"> 9.6423236 </td>
-   <td style="text-align:right;"> 34.0195680 </td>
-   <td style="text-align:right;"> 35.8274902 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> ChestPainAtypical angina </td>
-   <td style="text-align:right;"> -16.3247037 </td>
-   <td style="text-align:right;"> 9.7289213 </td>
-   <td style="text-align:right;"> 22.6736038 </td>
-   <td style="text-align:right;"> 36.1492568 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> ChestPainNon-anginal pain </td>
-   <td style="text-align:right;"> -15.3471449 </td>
-   <td style="text-align:right;"> 9.1541813 </td>
-   <td style="text-align:right;"> 34.1239627 </td>
-   <td style="text-align:right;"> 34.0137249 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> ExerciseInducedAnginaYes </td>
-   <td style="text-align:right;"> 7.9952541 </td>
-   <td style="text-align:right;"> 4.8947727 </td>
-   <td style="text-align:right;"> 8.1371920 </td>
-   <td style="text-align:right;"> 18.1872573 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> HeartDiseaseYes </td>
-   <td style="text-align:right;"> 12.0913966 </td>
-   <td style="text-align:right;"> 5.2058240 </td>
-   <td style="text-align:right;"> 5.8795266 </td>
-   <td style="text-align:right;"> 19.3430149 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> MaximumHR </td>
-   <td style="text-align:right;"> 0.1226586 </td>
-   <td style="text-align:right;"> 0.0992801 </td>
-   <td style="text-align:right;"> 0.7201695 </td>
-   <td style="text-align:right;"> 0.3688901 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> (Intercept) </td>
-   <td style="text-align:right;"> 105.2923383 </td>
-   <td style="text-align:right;"> 14.6933205 </td>
-   <td style="text-align:right;"> 150.9743256 </td>
-   <td style="text-align:right;"> 38.7467039 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> Age </td>
-   <td style="text-align:right;"> 0.4800104 </td>
-   <td style="text-align:right;"> 0.1417168 </td>
-   <td style="text-align:right;"> 0.7654107 </td>
-   <td style="text-align:right;"> 0.3737111 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> BloodSugarTRUE </td>
-   <td style="text-align:right;"> 4.9616363 </td>
-   <td style="text-align:right;"> 3.1197639 </td>
-   <td style="text-align:right;"> -6.8540853 </td>
-   <td style="text-align:right;"> 8.2269061 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> ChestPainAsymptomatic </td>
-   <td style="text-align:right;"> -10.0474949 </td>
-   <td style="text-align:right;"> 4.2547960 </td>
-   <td style="text-align:right;"> 3.3795322 </td>
-   <td style="text-align:right;"> 11.2200180 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> ChestPainAtypical angina </td>
-   <td style="text-align:right;"> -8.6148546 </td>
-   <td style="text-align:right;"> 4.6798629 </td>
-   <td style="text-align:right;"> 9.5540927 </td>
-   <td style="text-align:right;"> 12.3409315 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> ChestPainNon-anginal pain </td>
-   <td style="text-align:right;"> -6.9875791 </td>
-   <td style="text-align:right;"> 4.3056911 </td>
-   <td style="text-align:right;"> -0.8015539 </td>
-   <td style="text-align:right;"> 11.3542299 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> ExerciseInducedAnginaYes </td>
-   <td style="text-align:right;"> -1.0827067 </td>
-   <td style="text-align:right;"> 2.7780388 </td>
-   <td style="text-align:right;"> 6.8846691 </td>
-   <td style="text-align:right;"> 7.3257672 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> HeartDiseaseYes </td>
-   <td style="text-align:right;"> 3.0740495 </td>
-   <td style="text-align:right;"> 2.8029917 </td>
-   <td style="text-align:right;"> 13.4020228 </td>
-   <td style="text-align:right;"> 7.3915687 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> MaximumHR </td>
-   <td style="text-align:right;"> 0.0391572 </td>
-   <td style="text-align:right;"> 0.0600935 </td>
-   <td style="text-align:right;"> 0.2387579 </td>
-   <td style="text-align:right;"> 0.1584683 </td>
-  </tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+93.7187493
+</td>
+<td style="text-align:right;">
+24.6536900
+</td>
+<td style="text-align:right;">
+-12.1297785
+</td>
+<td style="text-align:right;">
+91.6044593
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.5330329
+</td>
+<td style="text-align:right;">
+0.2096016
+</td>
+<td style="text-align:right;">
+2.2975419
+</td>
+<td style="text-align:right;">
+0.7788061
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+BloodSugarTRUE
+</td>
+<td style="text-align:right;">
+6.9178015
+</td>
+<td style="text-align:right;">
+5.5329199
+</td>
+<td style="text-align:right;">
+24.5796821
+</td>
+<td style="text-align:right;">
+20.5583885
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+ChestPainAsymptomatic
+</td>
+<td style="text-align:right;">
+-14.1810178
+</td>
+<td style="text-align:right;">
+9.6423236
+</td>
+<td style="text-align:right;">
+34.0195680
+</td>
+<td style="text-align:right;">
+35.8274902
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+ChestPainAtypical angina
+</td>
+<td style="text-align:right;">
+-16.3247037
+</td>
+<td style="text-align:right;">
+9.7289213
+</td>
+<td style="text-align:right;">
+22.6736038
+</td>
+<td style="text-align:right;">
+36.1492568
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+ChestPainNon-anginal pain
+</td>
+<td style="text-align:right;">
+-15.3471449
+</td>
+<td style="text-align:right;">
+9.1541813
+</td>
+<td style="text-align:right;">
+34.1239627
+</td>
+<td style="text-align:right;">
+34.0137249
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+ExerciseInducedAnginaYes
+</td>
+<td style="text-align:right;">
+7.9952541
+</td>
+<td style="text-align:right;">
+4.8947727
+</td>
+<td style="text-align:right;">
+8.1371920
+</td>
+<td style="text-align:right;">
+18.1872573
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+HeartDiseaseYes
+</td>
+<td style="text-align:right;">
+12.0913966
+</td>
+<td style="text-align:right;">
+5.2058240
+</td>
+<td style="text-align:right;">
+5.8795266
+</td>
+<td style="text-align:right;">
+19.3430149
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+MaximumHR
+</td>
+<td style="text-align:right;">
+0.1226586
+</td>
+<td style="text-align:right;">
+0.0992801
+</td>
+<td style="text-align:right;">
+0.7201695
+</td>
+<td style="text-align:right;">
+0.3688901
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+105.2923383
+</td>
+<td style="text-align:right;">
+14.6933205
+</td>
+<td style="text-align:right;">
+150.9743256
+</td>
+<td style="text-align:right;">
+38.7467039
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.4800104
+</td>
+<td style="text-align:right;">
+0.1417168
+</td>
+<td style="text-align:right;">
+0.7654107
+</td>
+<td style="text-align:right;">
+0.3737111
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+BloodSugarTRUE
+</td>
+<td style="text-align:right;">
+4.9616363
+</td>
+<td style="text-align:right;">
+3.1197639
+</td>
+<td style="text-align:right;">
+-6.8540853
+</td>
+<td style="text-align:right;">
+8.2269061
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+ChestPainAsymptomatic
+</td>
+<td style="text-align:right;">
+-10.0474949
+</td>
+<td style="text-align:right;">
+4.2547960
+</td>
+<td style="text-align:right;">
+3.3795322
+</td>
+<td style="text-align:right;">
+11.2200180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+ChestPainAtypical angina
+</td>
+<td style="text-align:right;">
+-8.6148546
+</td>
+<td style="text-align:right;">
+4.6798629
+</td>
+<td style="text-align:right;">
+9.5540927
+</td>
+<td style="text-align:right;">
+12.3409315
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+ChestPainNon-anginal pain
+</td>
+<td style="text-align:right;">
+-6.9875791
+</td>
+<td style="text-align:right;">
+4.3056911
+</td>
+<td style="text-align:right;">
+-0.8015539
+</td>
+<td style="text-align:right;">
+11.3542299
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+ExerciseInducedAnginaYes
+</td>
+<td style="text-align:right;">
+-1.0827067
+</td>
+<td style="text-align:right;">
+2.7780388
+</td>
+<td style="text-align:right;">
+6.8846691
+</td>
+<td style="text-align:right;">
+7.3257672
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+HeartDiseaseYes
+</td>
+<td style="text-align:right;">
+3.0740495
+</td>
+<td style="text-align:right;">
+2.8029917
+</td>
+<td style="text-align:right;">
+13.4020228
+</td>
+<td style="text-align:right;">
+7.3915687
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+MaximumHR
+</td>
+<td style="text-align:right;">
+0.0391572
+</td>
+<td style="text-align:right;">
+0.0600935
+</td>
+<td style="text-align:right;">
+0.2387579
+</td>
+<td style="text-align:right;">
+0.1584683
+</td>
+</tr>
 </tbody>
 </table>
-
-<p>The <code>at</code> argument specifies which columns should be spanned in the header. Let&#39;s try it with the two-key example from above:</p>
-
-<pre><code class="r">straught2 %&gt;%
-  grable(
-    at = -Parameter
-  )
-</code></pre>
-
+<p>The <code>at</code> argument specifies which columns should be
+spanned in the header. Let’s try it with the two-key example from
+above:</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>straught2 <span class="sc">%&gt;%</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grable</span>(</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">at =</span> <span class="sc">-</span>Parameter</span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;">
- <thead>
+<thead>
 <tr>
-<th style="border-bottom:hidden" colspan="1"></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Female</div></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Male</div></th>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Female
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="4">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Male
+</div>
+</th>
 </tr>
 <tr>
-<th style="border-bottom:hidden" colspan="1"></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">BP</div></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Cholesterol</div></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">BP</div></th>
-<th style="border-bottom:hidden; padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">Cholesterol</div></th>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+BP
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Cholesterol
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+BP
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="2">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Cholesterol
+</div>
+</th>
 </tr>
-  <tr>
-   <th style="text-align:left;"> Parameter </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-   <th style="text-align:right;"> Estimate </th>
-   <th style="text-align:right;"> SE </th>
-  </tr>
- </thead>
+<tr>
+<th style="text-align:left;">
+Parameter
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+Estimate
+</th>
+<th style="text-align:right;">
+SE
+</th>
+</tr>
+</thead>
 <tbody>
-  <tr>
-   <td style="text-align:left;"> (Intercept) </td>
-   <td style="text-align:right;"> 93.7187493 </td>
-   <td style="text-align:right;"> 24.6536900 </td>
-   <td style="text-align:right;"> -12.1297785 </td>
-   <td style="text-align:right;"> 91.6044593 </td>
-   <td style="text-align:right;"> 105.2923383 </td>
-   <td style="text-align:right;"> 14.6933205 </td>
-   <td style="text-align:right;"> 150.9743256 </td>
-   <td style="text-align:right;"> 38.7467039 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Age </td>
-   <td style="text-align:right;"> 0.5330329 </td>
-   <td style="text-align:right;"> 0.2096016 </td>
-   <td style="text-align:right;"> 2.2975419 </td>
-   <td style="text-align:right;"> 0.7788061 </td>
-   <td style="text-align:right;"> 0.4800104 </td>
-   <td style="text-align:right;"> 0.1417168 </td>
-   <td style="text-align:right;"> 0.7654107 </td>
-   <td style="text-align:right;"> 0.3737111 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> BloodSugarTRUE </td>
-   <td style="text-align:right;"> 6.9178015 </td>
-   <td style="text-align:right;"> 5.5329199 </td>
-   <td style="text-align:right;"> 24.5796821 </td>
-   <td style="text-align:right;"> 20.5583885 </td>
-   <td style="text-align:right;"> 4.9616363 </td>
-   <td style="text-align:right;"> 3.1197639 </td>
-   <td style="text-align:right;"> -6.8540853 </td>
-   <td style="text-align:right;"> 8.2269061 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> ChestPainAsymptomatic </td>
-   <td style="text-align:right;"> -14.1810178 </td>
-   <td style="text-align:right;"> 9.6423236 </td>
-   <td style="text-align:right;"> 34.0195680 </td>
-   <td style="text-align:right;"> 35.8274902 </td>
-   <td style="text-align:right;"> -10.0474949 </td>
-   <td style="text-align:right;"> 4.2547960 </td>
-   <td style="text-align:right;"> 3.3795322 </td>
-   <td style="text-align:right;"> 11.2200180 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> ChestPainAtypical angina </td>
-   <td style="text-align:right;"> -16.3247037 </td>
-   <td style="text-align:right;"> 9.7289213 </td>
-   <td style="text-align:right;"> 22.6736038 </td>
-   <td style="text-align:right;"> 36.1492568 </td>
-   <td style="text-align:right;"> -8.6148546 </td>
-   <td style="text-align:right;"> 4.6798629 </td>
-   <td style="text-align:right;"> 9.5540927 </td>
-   <td style="text-align:right;"> 12.3409315 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> ChestPainNon-anginal pain </td>
-   <td style="text-align:right;"> -15.3471449 </td>
-   <td style="text-align:right;"> 9.1541813 </td>
-   <td style="text-align:right;"> 34.1239627 </td>
-   <td style="text-align:right;"> 34.0137249 </td>
-   <td style="text-align:right;"> -6.9875791 </td>
-   <td style="text-align:right;"> 4.3056911 </td>
-   <td style="text-align:right;"> -0.8015539 </td>
-   <td style="text-align:right;"> 11.3542299 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> ExerciseInducedAnginaYes </td>
-   <td style="text-align:right;"> 7.9952541 </td>
-   <td style="text-align:right;"> 4.8947727 </td>
-   <td style="text-align:right;"> 8.1371920 </td>
-   <td style="text-align:right;"> 18.1872573 </td>
-   <td style="text-align:right;"> -1.0827067 </td>
-   <td style="text-align:right;"> 2.7780388 </td>
-   <td style="text-align:right;"> 6.8846691 </td>
-   <td style="text-align:right;"> 7.3257672 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> HeartDiseaseYes </td>
-   <td style="text-align:right;"> 12.0913966 </td>
-   <td style="text-align:right;"> 5.2058240 </td>
-   <td style="text-align:right;"> 5.8795266 </td>
-   <td style="text-align:right;"> 19.3430149 </td>
-   <td style="text-align:right;"> 3.0740495 </td>
-   <td style="text-align:right;"> 2.8029917 </td>
-   <td style="text-align:right;"> 13.4020228 </td>
-   <td style="text-align:right;"> 7.3915687 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MaximumHR </td>
-   <td style="text-align:right;"> 0.1226586 </td>
-   <td style="text-align:right;"> 0.0992801 </td>
-   <td style="text-align:right;"> 0.7201695 </td>
-   <td style="text-align:right;"> 0.3688901 </td>
-   <td style="text-align:right;"> 0.0391572 </td>
-   <td style="text-align:right;"> 0.0600935 </td>
-   <td style="text-align:right;"> 0.2387579 </td>
-   <td style="text-align:right;"> 0.1584683 </td>
-  </tr>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+93.7187493
+</td>
+<td style="text-align:right;">
+24.6536900
+</td>
+<td style="text-align:right;">
+-12.1297785
+</td>
+<td style="text-align:right;">
+91.6044593
+</td>
+<td style="text-align:right;">
+105.2923383
+</td>
+<td style="text-align:right;">
+14.6933205
+</td>
+<td style="text-align:right;">
+150.9743256
+</td>
+<td style="text-align:right;">
+38.7467039
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:right;">
+0.5330329
+</td>
+<td style="text-align:right;">
+0.2096016
+</td>
+<td style="text-align:right;">
+2.2975419
+</td>
+<td style="text-align:right;">
+0.7788061
+</td>
+<td style="text-align:right;">
+0.4800104
+</td>
+<td style="text-align:right;">
+0.1417168
+</td>
+<td style="text-align:right;">
+0.7654107
+</td>
+<td style="text-align:right;">
+0.3737111
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BloodSugarTRUE
+</td>
+<td style="text-align:right;">
+6.9178015
+</td>
+<td style="text-align:right;">
+5.5329199
+</td>
+<td style="text-align:right;">
+24.5796821
+</td>
+<td style="text-align:right;">
+20.5583885
+</td>
+<td style="text-align:right;">
+4.9616363
+</td>
+<td style="text-align:right;">
+3.1197639
+</td>
+<td style="text-align:right;">
+-6.8540853
+</td>
+<td style="text-align:right;">
+8.2269061
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPainAsymptomatic
+</td>
+<td style="text-align:right;">
+-14.1810178
+</td>
+<td style="text-align:right;">
+9.6423236
+</td>
+<td style="text-align:right;">
+34.0195680
+</td>
+<td style="text-align:right;">
+35.8274902
+</td>
+<td style="text-align:right;">
+-10.0474949
+</td>
+<td style="text-align:right;">
+4.2547960
+</td>
+<td style="text-align:right;">
+3.3795322
+</td>
+<td style="text-align:right;">
+11.2200180
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPainAtypical angina
+</td>
+<td style="text-align:right;">
+-16.3247037
+</td>
+<td style="text-align:right;">
+9.7289213
+</td>
+<td style="text-align:right;">
+22.6736038
+</td>
+<td style="text-align:right;">
+36.1492568
+</td>
+<td style="text-align:right;">
+-8.6148546
+</td>
+<td style="text-align:right;">
+4.6798629
+</td>
+<td style="text-align:right;">
+9.5540927
+</td>
+<td style="text-align:right;">
+12.3409315
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPainNon-anginal pain
+</td>
+<td style="text-align:right;">
+-15.3471449
+</td>
+<td style="text-align:right;">
+9.1541813
+</td>
+<td style="text-align:right;">
+34.1239627
+</td>
+<td style="text-align:right;">
+34.0137249
+</td>
+<td style="text-align:right;">
+-6.9875791
+</td>
+<td style="text-align:right;">
+4.3056911
+</td>
+<td style="text-align:right;">
+-0.8015539
+</td>
+<td style="text-align:right;">
+11.3542299
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ExerciseInducedAnginaYes
+</td>
+<td style="text-align:right;">
+7.9952541
+</td>
+<td style="text-align:right;">
+4.8947727
+</td>
+<td style="text-align:right;">
+8.1371920
+</td>
+<td style="text-align:right;">
+18.1872573
+</td>
+<td style="text-align:right;">
+-1.0827067
+</td>
+<td style="text-align:right;">
+2.7780388
+</td>
+<td style="text-align:right;">
+6.8846691
+</td>
+<td style="text-align:right;">
+7.3257672
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HeartDiseaseYes
+</td>
+<td style="text-align:right;">
+12.0913966
+</td>
+<td style="text-align:right;">
+5.2058240
+</td>
+<td style="text-align:right;">
+5.8795266
+</td>
+<td style="text-align:right;">
+19.3430149
+</td>
+<td style="text-align:right;">
+3.0740495
+</td>
+<td style="text-align:right;">
+2.8029917
+</td>
+<td style="text-align:right;">
+13.4020228
+</td>
+<td style="text-align:right;">
+7.3915687
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MaximumHR
+</td>
+<td style="text-align:right;">
+0.1226586
+</td>
+<td style="text-align:right;">
+0.0992801
+</td>
+<td style="text-align:right;">
+0.7201695
+</td>
+<td style="text-align:right;">
+0.3688901
+</td>
+<td style="text-align:right;">
+0.0391572
+</td>
+<td style="text-align:right;">
+0.0600935
+</td>
+<td style="text-align:right;">
+0.2387579
+</td>
+<td style="text-align:right;">
+0.1584683
+</td>
+</tr>
 </tbody>
 </table>
-
-<p>The tables can then be piped through subsequent customized processing with <a href="https://CRAN.R-project.org/package=kableExtra"><code>kableExtra</code></a> tools.</p>
-
+<p>The tables can then be piped through subsequent customized processing
+with <a href="https://CRAN.R-project.org/package=kableExtra"><code>kableExtra</code></a>
+tools.</p>
+</div>
+</div>
+<div id="univariate-analysis" class="section level1">
 <h1>Univariate analysis</h1>
-
-<p><code>descriptives()</code> produces a data frame in long format with a collection of descriptive statistics.</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  descriptives()
-</code></pre>
-
-<pre><code>## # A tibble: 111 x 9
-##    fun_eval fun_key col_ind col_lab val_ind val_lab val_dbl val_chr val_cbn
-##    &lt;chr&gt;    &lt;chr&gt;     &lt;int&gt; &lt;chr&gt;     &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;  
-##  1 all      availa…       1 Age           1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  2 all      availa…       2 Sex           1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  3 all      availa…       3 ChestP…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  4 all      availa…       4 BP            1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  5 all      availa…       5 Choles…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  6 all      availa…       6 BloodS…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  7 all      availa…       7 Maximu…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  8 all      availa…       8 Exerci…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-##  9 all      availa…       9 HeartD…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
-## 10 all      class         1 Age           1 &lt;NA&gt;         NA numeric numeric
-## # … with 101 more rows
-</code></pre>
-
-<p><code>univariate_associations()</code> is a special case of <code>dish()</code> specifically for computing association metrics of one or more <code>responses</code> with a collection of <code>predictors</code>.</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  univariate_associations(
-    f = list(AIC = function(y, x) AIC(lm(y ~ x))),
-    responses = c(BP, Cholesterol)
-  )
-</code></pre>
-
-<pre><code>## # A tibble: 14 x 3
+<p><code>descriptives()</code> produces a data frame in long format with
+a collection of descriptive statistics.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">descriptives</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 111 × 9
+##    fun_eval fun_key   col_ind col_lab    val_ind val_lab val_dbl val_chr val_cbn
+##    &lt;chr&gt;    &lt;chr&gt;       &lt;int&gt; &lt;chr&gt;        &lt;int&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;  
+##  1 all      available       1 Age              1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  2 all      available       2 Sex              1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  3 all      available       3 ChestPain        1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  4 all      available       4 BP               1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  5 all      available       5 Cholester…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  6 all      available       6 BloodSugar       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  7 all      available       7 MaximumHR        1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  8 all      available       8 ExerciseI…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+##  9 all      available       9 HeartDise…       1 &lt;NA&gt;        303 &lt;NA&gt;    303    
+## 10 all      class           1 Age              1 &lt;NA&gt;         NA numeric numeric
+## # … with 101 more rows</code></pre>
+<p><code>univariate_associations()</code> is a special case of
+<code>dish()</code> specifically for computing association metrics of
+one or more <code>responses</code> with a collection of
+<code>predictors</code>.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">univariate_associations</span>(</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">f =</span> <span class="fu">list</span>(<span class="at">AIC =</span> <span class="cf">function</span>(y, x) <span class="fu">AIC</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x))),</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">responses =</span> <span class="fu">c</span>(BP, Cholesterol)</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## # A tibble: 14 × 3
 ##    response    predictor               AIC
 ##    &lt;chr&gt;       &lt;chr&gt;                 &lt;dbl&gt;
 ##  1 BP          Age                   2577.
@@ -1628,99 +2405,197 @@ straught2
 ## 11 Cholesterol BloodSugar            3257.
 ## 12 Cholesterol MaximumHR             3257.
 ## 13 Cholesterol ExerciseInducedAngina 3256.
-## 14 Cholesterol HeartDisease          3255.
-</code></pre>
-
-<p><code>univariate_table()</code> allows you to create a custom descriptive table for a dataset. It uses almost every function in the package across its span of capabilities.</p>
-
-<pre><code class="r">heart_disease %&gt;%
-  univariate_table()
-</code></pre>
-
+## 14 Cholesterol HeartDisease          3255.</code></pre>
+<p><code>univariate_table()</code> allows you to create a custom
+descriptive table for a data set. It uses almost every function in the
+package across its span of capabilities.</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>heart_disease <span class="sc">%&gt;%</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">univariate_table</span>()</span></code></pre></div>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
- <thead>
-  <tr>
-   <th style="text-align:left;"> Variable </th>
-   <th style="text-align:left;"> Level </th>
-   <th style="text-align:left;"> Summary </th>
-  </tr>
- </thead>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:left;">
+Level
+</th>
+<th style="text-align:left;">
+Summary
+</th>
+</tr>
+</thead>
 <tbody>
-  <tr>
-   <td style="text-align:left;"> Age </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> 56 (48, 61) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> Sex </td>
-   <td style="text-align:left;"> Female </td>
-   <td style="text-align:left;"> 97 (32.01%) </td>
-  </tr>
-  <tr>
-   
-   <td style="text-align:left;"> Male </td>
-   <td style="text-align:left;"> 206 (67.99%) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;vertical-align: top !important;" rowspan="4"> ChestPain </td>
-   <td style="text-align:left;"> Typical angina </td>
-   <td style="text-align:left;"> 23 (7.59%) </td>
-  </tr>
-  <tr>
-   
-   <td style="text-align:left;"> Atypical angina </td>
-   <td style="text-align:left;"> 50 (16.5%) </td>
-  </tr>
-  <tr>
-   
-   <td style="text-align:left;"> Non-anginal pain </td>
-   <td style="text-align:left;"> 86 (28.38%) </td>
-  </tr>
-  <tr>
-   
-   <td style="text-align:left;"> Asymptomatic </td>
-   <td style="text-align:left;"> 144 (47.52%) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> BP </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> 130 (120, 140) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> Cholesterol </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> 241 (211, 275) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> MaximumHR </td>
-   <td style="text-align:left;">  </td>
-   <td style="text-align:left;"> 153 (133.5, 166) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> ExerciseInducedAngina </td>
-   <td style="text-align:left;"> No </td>
-   <td style="text-align:left;"> 204 (67.33%) </td>
-  </tr>
-  <tr>
-   
-   <td style="text-align:left;"> Yes </td>
-   <td style="text-align:left;"> 99 (32.67%) </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;vertical-align: top !important;" rowspan="2"> HeartDisease </td>
-   <td style="text-align:left;"> No </td>
-   <td style="text-align:left;"> 164 (54.13%) </td>
-  </tr>
-  <tr>
-   
-   <td style="text-align:left;"> Yes </td>
-   <td style="text-align:left;"> 139 (45.87%) </td>
-  </tr>
+<tr>
+<td style="text-align:left;">
+Age
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+56 (48, 61)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex
+</td>
+<td style="text-align:left;">
+Female
+</td>
+<td style="text-align:left;">
+97 (32.01%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sex
+</td>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:left;">
+206 (67.99%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPain
+</td>
+<td style="text-align:left;">
+Typical angina
+</td>
+<td style="text-align:left;">
+23 (7.59%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPain
+</td>
+<td style="text-align:left;">
+Atypical angina
+</td>
+<td style="text-align:left;">
+50 (16.5%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPain
+</td>
+<td style="text-align:left;">
+Non-anginal pain
+</td>
+<td style="text-align:left;">
+86 (28.38%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ChestPain
+</td>
+<td style="text-align:left;">
+Asymptomatic
+</td>
+<td style="text-align:left;">
+144 (47.52%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BP
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+130 (120, 140)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cholesterol
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+241 (211, 275)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+MaximumHR
+</td>
+<td style="text-align:left;">
+</td>
+<td style="text-align:left;">
+153 (133.5, 166)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ExerciseInducedAngina
+</td>
+<td style="text-align:left;">
+No
+</td>
+<td style="text-align:left;">
+204 (67.33%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ExerciseInducedAngina
+</td>
+<td style="text-align:left;">
+Yes
+</td>
+<td style="text-align:left;">
+99 (32.67%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HeartDisease
+</td>
+<td style="text-align:left;">
+No
+</td>
+<td style="text-align:left;">
+164 (54.13%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+HeartDisease
+</td>
+<td style="text-align:left;">
+Yes
+</td>
+<td style="text-align:left;">
+139 (45.87%)
+</td>
+</tr>
 </tbody>
 </table>
+<p>See <code>vignette(&quot;describe&quot;)</code> for a more in-depth
+introduction to these functions.</p>
+</div>
 
-<p>See <code>vignette(&quot;describe&quot;)</code> for a more in-depth introduction to these functions.</p>
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 
 </body>
-
 </html>
